@@ -1,0 +1,2720 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bonnyticket - ระบบจองคิวรับกดบัตรและบัตรสมาชิก</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+Thai:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Noto Sans Thai"', 'Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        bonny: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            200: '#bae6fd',
+                            300: '#7dd3fc',
+                            400: '#38bdf8',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                        }
+                    },
+                    boxShadow: {
+                        'soft': '0 10px 25px -5px rgba(14, 165, 233, 0.18), 0 8px 10px -6px rgba(14, 165, 233, 0.1)',
+                        'cloud': '0 12px 30px -4px rgba(56, 189, 248, 0.25)',
+                        'card': '0 4px 20px -2px rgba(14, 165, 233, 0.12)',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background: linear-gradient(180deg, #dff3ff 0%, #eef9ff 38%, #f8fcff 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        .sky-banner-gradient {
+            background: linear-gradient(135deg, #38bdf8 0%, #0ea5e9 55%, #6366f1 100%);
+        }
+        .glass-nav {
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(12px);
+        }
+        @keyframes floatCloudSlow {
+            0%, 100% { transform: translateX(0px) translateY(0px); }
+            50% { transform: translateX(18px) translateY(-6px); }
+        }
+        @keyframes floatCloudReverse {
+            0%, 100% { transform: translateX(0px) translateY(0px); }
+            50% { transform: translateX(-16px) translateY(5px); }
+        }
+        @keyframes twinkleStar {
+            0%, 100% { opacity: 0.35; transform: scale(0.85); }
+            50% { opacity: 1; transform: scale(1.2); }
+        }
+        @keyframes bobCute {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-5px); }
+        }
+        @keyframes marqueeScroll {
+            0% { transform: translateX(0%); }
+            100% { transform: translateX(-50%); }
+        }
+        @keyframes sparklePop {
+            0% { opacity: 1; transform: translate(-50%, -50%) scale(0.4) rotate(0deg); }
+            60% { opacity: 1; transform: translate(-50%, -130%) scale(1.15) rotate(20deg); }
+            100% { opacity: 0; transform: translate(-50%, -190%) scale(0.7) rotate(45deg); }
+        }
+        @keyframes mascotBlink {
+            0%, 92%, 100% { transform: scaleY(1); }
+            96% { transform: scaleY(0.1); }
+        }
+        .cloud-drift-1 { animation: floatCloudSlow 9s ease-in-out infinite; }
+        .cloud-drift-2 { animation: floatCloudReverse 11s ease-in-out infinite; }
+        .star-twinkle { animation: twinkleStar 3.2s ease-in-out infinite; }
+        .cute-bob { animation: bobCute 2.8s ease-in-out infinite; }
+        .animate-marquee {
+            display: inline-flex;
+            white-space: nowrap;
+            animation: marqueeScroll 24s linear infinite;
+        }
+        .animate-marquee:hover {
+            animation-play-state: paused;
+        }
+        .sparkle-particle {
+            position: fixed;
+            pointer-events: none;
+            z-index: 9999;
+            animation: sparklePop 0.85s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            user-select: none;
+        }
+        .mascot-eye {
+            transform-origin: center;
+            animation: mascotBlink 4.2s infinite;
+        }
+        .ticket-cutout {
+            position: relative;
+        }
+        .ticket-cutout::before,
+        .ticket-cutout::after {
+            content: '';
+            position: absolute;
+            width: 22px;
+            height: 22px;
+            background: #eef9ff;
+            border-radius: 9999px;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 10;
+        }
+        .ticket-cutout::before { left: -11px; }
+        .ticket-cutout::after { right: -11px; }
+    </style>
+</head>
+<body class="text-slate-800 antialiased selection:bg-bonny-200 selection:text-bonny-700">
+    <!-- Floating Sky Clouds & Stars Backdrop -->
+    <div class="fixed inset-0 pointer-events-none overflow-hidden z-0" aria-hidden="true">
+        <svg class="absolute top-12 -left-10 w-56 h-28 text-white/80 cloud-drift-1" viewBox="0 0 200 100" fill="currentColor">
+            <path d="M35 85h130a25 25 0 0 0 4-49.7A38 38 0 0 0 96 22a32 32 0 0 0-58 17A24 24 0 0 0 35 85z"/>
+        </svg>
+        <svg class="absolute top-32 -right-8 w-64 h-32 text-white/75 cloud-drift-2" viewBox="0 0 200 100" fill="currentColor">
+            <path d="M35 85h130a25 25 0 0 0 4-49.7A38 38 0 0 0 96 22a32 32 0 0 0-58 17A24 24 0 0 0 35 85z"/>
+        </svg>
+        <svg class="absolute bottom-24 left-6 w-44 h-24 text-white/65 cloud-drift-2" viewBox="0 0 200 100" fill="currentColor">
+            <path d="M35 85h130a25 25 0 0 0 4-49.7A38 38 0 0 0 96 22a32 32 0 0 0-58 17A24 24 0 0 0 35 85z"/>
+        </svg>
+        <span class="absolute top-20 left-1/4 text-amber-300 text-lg star-twinkle">✦</span>
+        <span class="absolute top-44 right-1/4 text-sky-400 text-sm star-twinkle" style="animation-delay: 1s;">✦</span>
+        <span class="absolute bottom-40 right-12 text-amber-300 text-base star-twinkle" style="animation-delay: 2s;">★</span>
+    </div>
+
+    <!-- Toast Notification Container -->
+    <div id="toast-container" class="fixed top-4 right-4 z-50 flex flex-col gap-2 max-w-xs w-full pointer-events-none"></div>
+
+    <!-- Modal Overlay Container -->
+    <div id="modal-container" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/50 backdrop-blur-xs p-4 overflow-y-auto"></div>
+
+    <!-- Main Root Container -->
+    <div id="app" class="relative z-10 min-h-screen flex flex-col"></div>
+
+    <script>
+        /**
+         * ============================================================================
+         * BONNYTICKET DATABASE & PERSISTENT STORAGE
+         * ============================================================================
+         */
+        const STORAGE_KEY = 'bonnyticket_db_v4';
+
+        const DEFAULT_DB = {
+            settings: {
+                siteName: 'Bonnyticket',
+                siteDescription: 'บริการรับจองคิวกดบัตรคอนเสิร์ต แฟนมีตติ้ง และอีเวนต์ทุกรูปแบบ มั่นใจ ปลอดภัย รวดเร็ว 100%',
+                logoUrl: '',
+                announcement: 'เปิดรับจองคิวคอนเสิร์ตใหญ่ประจำเดือนนี้แล้ว! มัดจำเริ่มต้นเพียงใบละ 200 บาท กดบัตรสำเร็จรับแต้มสะสมแลกของรางวัลฟรี ☁️✨',
+                adminLineUrl: 'https://lin.ee/XXNFDVd',
+                pointsPerTicket: 50,
+                bankName: 'ธนาคารกสิกรไทย (KBANK)',
+                bankAccountNumber: '148-2-95631-0',
+                bankAccountName: 'บจก. บอนนี่ทิกเก็ต เซอร์วิส',
+                globalBookingRules: '1. ค่ามัดจำคิวกดบัตรจะถูกหักออกจากค่าบัตรจริงเมื่อกดบัตรสำเร็จ\n2. หากทางร้านกดบัตรไม่สำเร็จ ยินดีคืนเงินมัดจำเต็มจำนวน 100% ภายใน 24 ชม.\n3. เมื่อกดบัตรสำเร็จแล้ว กรุณาชำระยอดค่าบัตรส่วนที่เหลือภายในเวลาที่กำหนด'
+            },
+            inviteCodes: [
+                { id: 'INV-1', code: 'BNY888', note: 'รหัสลูกค้าทั่วไปชุดที่ 1', active: true },
+                { id: 'INV-2', code: 'VIP2026', note: 'รหัสลูกค้า VIP', active: true },
+                { id: 'INV-3', code: 'CLOUD99', note: 'รหัสลูกค้าประจำ', active: true },
+                { id: 'INV-4', code: 'BONNY01', note: 'รหัสเปิดร้านใหม่', active: true }
+            ],
+            users: [
+                {
+                    id: 'USR-MASTER',
+                    username: 'Bonnyticket',
+                    password: '0934909361',
+                    fullName: 'แอดมิน บอนนี่ทิกเก็ต',
+                    phone: '0934909361',
+                    lineId: '@bonnyticket',
+                    inviteCode: 'MASTER-ADMIN',
+                    memberId: 'BNY-000001',
+                    points: 1250,
+                    addresses: [
+                        { id: 'ADDR-1', label: 'สำนักงานใหญ่', detail: '99/9 อาคารสกายทาวเวอร์ ถ.สุขุมวิท กรุงเทพฯ 10110' }
+                    ],
+                    refundBank: {
+                        bankName: 'ธนาคารกสิกรไทย (KBANK)',
+                        accountNumber: '093-4-90936-1',
+                        accountName: 'แอดมิน บอนนี่ทิกเก็ต'
+                    }
+                }
+            ],
+            events: [
+                {
+                    id: 'EVT-101',
+                    title: 'SKY DREAM WORLD TOUR 2026 IN BANGKOK',
+                    image: 'https://placehold.co/800x450/38bdf8/ffffff?text=SKY+DREAM+TOUR+2026',
+                    depositPerTicket: 200,
+                    prices: ['6,500 บาท (VIP SOUNDCHECK)', '5,500 บาท (โซน A ติดเวที)', '4,500 บาท (โซน B)', '3,200 บาท (โซน C)', '2,200 บาท (โซนดอย)'],
+                    dates: ['เสาร์ที่ 20 ธ.ค. 2569 (18:00 น.)', 'อาทิตย์ที่ 21 ธ.ค. 2569 (17:00 น.)'],
+                    rules: '1. มัดจำคิวกดบัตรใบละ 200 บาท (หักจากค่าบัตรจริงเมื่อกดสำเร็จ)\n2. หากทางร้านกดบัตรไม่สำเร็จ ยินดีคืนเงินมัดจำเต็มจำนวน 100% ภายใน 24 ชม.\n3. กรุณาแจ้งโซนสำรองอย่างน้อย 2 โซน เพื่อเพิ่มโอกาสได้บัตร\n4. เมื่อกดบัตรได้แล้ว ต้องชำระค่าบัตรส่วนที่เหลือภายใน 3 ชั่วโมง',
+                    active: true
+                },
+                {
+                    id: 'EVT-102',
+                    title: 'CLOUD NINE FANMEETING : FIRST LOVE IN BKK',
+                    image: 'https://placehold.co/800x450/0ea5e9/ffffff?text=CLOUD+NINE+FANMEETING',
+                    depositPerTicket: 200,
+                    prices: ['5,900 บาท (All Hi-Bye + Poster)', '4,500 บาท (Zone A)', '3,500 บาท (Zone B)', '2,500 บาท (Zone C)'],
+                    dates: ['เสาร์ที่ 10 ม.ค. 2570 (17:00 น.)'],
+                    rules: '1. ค่ามัดจำใบละ 200 บาท ต่อ 1 ที่นั่ง\n2. จำกัดการจองสูงสุด 4 ใบต่อ 1 ออเดอร์\n3. คืนเงินมัดจำเต็มจำนวนหากไม่ได้บัตรตามโซนที่ตกลงไว้',
+                    active: true
+                },
+                {
+                    id: 'EVT-103',
+                    title: 'BLUE OCEAN MUSIC FESTIVAL 2026',
+                    image: 'https://placehold.co/800x450/0284c7/ffffff?text=BLUE+OCEAN+FEST+2026',
+                    depositPerTicket: 200,
+                    prices: ['3,900 บาท (VIP Lounge 2 วัน)', '2,400 บาท (Regular 2 วัน)', '1,500 บาท (1 Day Pass)'],
+                    dates: ['เสาร์ที่ 14 ก.พ. 2570', 'อาทิตย์ที่ 15 ก.พ. 2570'],
+                    rules: '1. มัดจำคิว 200 บาท/ใบ\n2. บัตรประเภท E-Ticket จัดส่งเข้าเมนู "บัตรของฉัน" ทันทีหลังชำระครบ',
+                    active: true
+                }
+            ],
+            bookings: [],
+            myTickets: [],
+            rewards: [
+                {
+                    id: 'RWD-1',
+                    title: 'ส่วนลดค่ามัดจำกดบัตร 100 บาท',
+                    image: 'https://placehold.co/400x300/38bdf8/ffffff?text=DISCOUNT+100B',
+                    pointsRequired: 100,
+                    stock: 50
+                },
+                {
+                    id: 'RWD-2',
+                    title: 'พวงกุญแจก้อนเมฆ Bonny Limited Edition',
+                    image: 'https://placehold.co/400x300/0ea5e9/ffffff?text=BONNY+CLOUD+KEYCHAIN',
+                    pointsRequired: 250,
+                    stock: 20
+                },
+                {
+                    id: 'RWD-3',
+                    title: 'สิทธิ์ Fast-Track คิวแรกสุดฟรี 1 ครั้ง',
+                    image: 'https://placehold.co/400x300/6366f1/ffffff?text=VIP+FAST+TRACK',
+                    pointsRequired: 500,
+                    stock: 10
+                }
+            ],
+            redemptions: []
+        };
+
+        function loadDB() {
+            try {
+                const raw = localStorage.getItem(STORAGE_KEY);
+                if (!raw) {
+                    localStorage.setItem(STORAGE_KEY, JSON.stringify(DEFAULT_DB));
+                    return JSON.parse(JSON.stringify(DEFAULT_DB));
+                }
+                const parsed = JSON.parse(raw);
+                return Object.assign({}, DEFAULT_DB, parsed, {
+                    settings: Object.assign({}, DEFAULT_DB.settings, parsed.settings || {})
+                });
+            } catch (e) {
+                return JSON.parse(JSON.stringify(DEFAULT_DB));
+            }
+        }
+
+        let db = loadDB();
+
+        function saveDB() {
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(db));
+            } catch (e) {
+                showToast('พื้นที่จัดเก็บข้อมูลเต็ม กรุณาลบข้อมูลเก่าบางส่วน', 'error');
+            }
+        }
+
+        // Runtime State
+        let state = {
+            currentUserId: sessionStorage.getItem('bonny_current_user') || null,
+            authMode: 'login', // 'login' | 'register' | 'forgot'
+            activeTab: 'home', // 'home' | 'bookings' | 'tickets' | 'member' | 'profile'
+            bookingFilter: 'all',
+            viewMode: 'customer', // 'customer' | 'admin'
+            adminTab: 'overview', // 'overview' | 'orders' | 'issue_ticket' | 'events' | 'rewards' | 'customers' | 'settings'
+            bookingStepData: null,
+            checkoutData: null,
+            adminCustomerSearch: '',
+            sparklesEnabled: localStorage.getItem('bonny_sparkles') !== 'false',
+            mascotBubbleOpen: true,
+            mascotTipIndex: 0
+        };
+
+        const MASCOT_TIPS = [
+            '☁️ สวัสดีค้าบ! น้องบอนนี่พร้อมช่วยเช็กคิวกดบัตรแล้วนะ 🩵',
+            '🔮 อย่าลืมกดปุ่ม "กดดูดวง (เลือกไพ่ 3 ใบ)" ก่อนจองคิวด้วยน้า~',
+            '🎫 กดบัตรสำเร็จ 1 ใบ รับแต้มสะสมไปแลกของรางวัลฟรีทันที!',
+            '💳 ใส่เลขบัญชีรับเงินคืนในหน้า "5. ฉัน" ไว้เผื่ออุ่นใจด้วยน้า',
+            '💬 ติดต่อแอดมินด่วน คลิกปุ่มทัก LINE ด้านล่างได้เลยคั้บ!'
+        ];
+
+        // 15 Unique Fortune Tarot Cards for "กดดูดวง" Feature
+        const FORTUNE_DECK_15 = [
+            {
+                id: 1,
+                roman: 'I',
+                name: 'ไพ่ราชินีก้อนเมฆสีฟ้า',
+                subtitle: 'The Sky Cloud Queen',
+                gradient: 'from-sky-400 via-blue-400 to-indigo-500',
+                badgeColor: 'bg-sky-100 text-sky-700',
+                meaning: 'ความสงบนำพาความสำเร็จ คิวของท่านจะลื่นไหลไร้อุปสรรค ได้บัตรโซนที่ตั้งใจไว้ตั้งแต่รอบแรกที่เปิดกด',
+                svgArt: `<svg viewBox="0 0 120 120" class="w-20 h-20 mx-auto"><circle cx="60" cy="60" r="46" fill="#e0f2fe"/><path d="M32 76h56a14 14 0 0 0 2-27.8A21 21 0 0 0 51 41a18 18 0 0 0-32 9.5A13.5 13.5 0 0 0 32 76z" fill="#38bdf8"/><path d="M48 31l6-9 6 7 6-7 6 9z" fill="#fbbf24"/><circle cx="60" cy="62" r="4" fill="#fff"/></svg>`
+            },
+            {
+                id: 2,
+                roman: 'II',
+                name: 'ไพ่ตั๋วทองคำแห่งโชคชะตา',
+                subtitle: 'The Golden VIP Pass',
+                gradient: 'from-amber-400 via-orange-400 to-rose-400',
+                badgeColor: 'bg-amber-100 text-amber-800',
+                meaning: 'ดวงมหาเฮงระดับ VIP! มีเกณฑ์ได้บัตรแถวหน้าหรือบัตรสิทธิ์พิเศษที่ใกล้ชิดศิลปินเกินความคาดหมาย',
+                svgArt: `<svg viewBox="0 0 120 120" class="w-20 h-20 mx-auto"><circle cx="60" cy="60" r="46" fill="#fef3c7"/><rect x="24" y="42" width="72" height="36" rx="8" fill="#f59e0b" stroke="#fff" stroke-width="3"/><path d="M60 48l3.5 7 7.5 1-5.5 5.2 1.3 7.5L60 65l-6.8 3.7 1.3-7.5-5.5-5.2 7.5-1z" fill="#fff"/></svg>`
+            },
+            {
+                id: 3,
+                roman: 'III',
+                name: 'ไพ่สายฟ้าความเร็วแสง',
+                subtitle: 'Lightning Queue Speed',
+                gradient: 'from-cyan-400 via-sky-500 to-blue-600',
+                badgeColor: 'bg-cyan-100 text-cyan-800',
+                meaning: 'จังหวะคลิกแม่นยำดุจสายฟ้าแลบ ระบบคิวจะเปิดทางให้เข้าหน้าเลือกที่นั่งก่อนใครในเสี้ยววินาที',
+                svgArt: `<svg viewBox="0 0 120 120" class="w-20 h-20 mx-auto"><circle cx="60" cy="60" r="46" fill="#cffafe"/><path d="M66 24L38 64h20l-6 32 30-42H62l4-30z" fill="#0284c7" stroke="#fbbf24" stroke-width="2.5" stroke-linejoin="round"/></svg>`
+            },
+            {
+                id: 4,
+                roman: 'IV',
+                name: 'ไพ่ดวงดาวนำทางหน้าเวที',
+                subtitle: 'Starlight Front Row',
+                gradient: 'from-indigo-400 via-purple-500 to-pink-500',
+                badgeColor: 'bg-indigo-100 text-indigo-700',
+                meaning: 'แสงดาวส่องประกายนำทางสู่จุดที่ดีที่สุดในฮอลล์ ไม่ว่าจะเลือกวันไหนก็จะได้มุมมองที่สวยงามชัดเจน',
+                svgArt: `<svg viewBox="0 0 120 120" class="w-20 h-20 mx-auto"><circle cx="60" cy="60" r="46" fill="#e0e7ff"/><path d="M60 24l9 22 24 2-18 16 6 23-21-13-21 13 6-23-18-16 24-2z" fill="#6366f1" stroke="#fde047" stroke-width="2.5"/></svg>`
+            },
+            {
+                id: 5,
+                roman: 'V',
+                name: 'ไพ่ปีกนางฟ้าพิทักษ์คิว',
+                subtitle: 'Guardian Angel Wings',
+                gradient: 'from-sky-300 via-teal-400 to-emerald-500',
+                badgeColor: 'bg-teal-100 text-teal-800',
+                meaning: 'มีสิ่งศักดิ์สิทธิ์และทีมงานมือโปรคอยเกื้อหนุน ต่อให้คนแย่งกดนับแสนคิวของท่านก็ปลอดภัยแน่นอน',
+                svgArt: `<svg viewBox="0 0 120 120" class="w-20 h-20 mx-auto"><circle cx="60" cy="60" r="46" fill="#ccfbf1"/><path d="M56 64C42 46 22 44 22 58c0 12 18 20 34 14M64 64c14-18 34-20 34-6 0 12-18 20-34 14" fill="#14b8a6" stroke="#fff" stroke-width="2.5"/><circle cx="60" cy="46" r="8" fill="#fbbf24"/></svg>`
+            },
+            {
+                id: 6,
+                roman: 'VI',
+                name: 'ไพ่พระจันทร์เสี้ยวสมปรารถนา',
+                subtitle: 'Crescent Wish Fulfillment',
+                gradient: 'from-blue-500 via-indigo-600 to-slate-800',
+                badgeColor: 'bg-blue-100 text-blue-800',
+                meaning: 'คำอธิษฐานของแฟนคลับกำลังจะเป็นจริง เตรียมชุดสวยและแท่งไฟไว้ได้เลย เพราะบัตรใบนี้เป็นของท่านแล้ว',
+                svgArt: `<svg viewBox="0 0 120 120" class="w-20 h-20 mx-auto"><circle cx="60" cy="60" r="46" fill="#1e293b"/><path d="M68 28a30 30 0 1 0 22 50 24 24 0 1 1-22-50z" fill="#fde047"/><circle cx="78" cy="42" r="3" fill="#38bdf8"/><circle cx="86" cy="54" r="2" fill="#fff"/></svg>`
+            },
+            {
+                id: 7,
+                roman: 'VII',
+                name: 'ไพ่สายรุ้งหลังฝนพรำ',
+                subtitle: 'Rainbow Miracle Drop',
+                gradient: 'from-rose-400 via-amber-400 to-sky-400',
+                badgeColor: 'bg-rose-100 text-rose-700',
+                meaning: 'ปาฏิหาริย์บัตรหลุดกำลังจะเกิดขึ้น! แม้รอบแรกจะดูตึงมือ แต่จะมีที่นั่งหลุดเด้งมาให้คว้าทันอย่างน่าอัศจรรย์',
+                svgArt: `<svg viewBox="0 0 120 120" class="w-20 h-20 mx-auto"><circle cx="60" cy="60" r="46" fill="#fff1f2"/><path d="M26 76a34 34 0 0 1 68 0" fill="none" stroke="#f43f5e" stroke-width="6"/><path d="M34 76a26 26 0 0 1 52 0" fill="none" stroke="#fbbf24" stroke-width="6"/><path d="M42 76a18 18 0 0 1 36 0" fill="none" stroke="#38bdf8" stroke-width="6"/></svg>`
+            },
+            {
+                id: 8,
+                roman: 'VIII',
+                name: 'ไพ่กุญแจเปิดประตูฮอลล์',
+                subtitle: 'The Master Hall Key',
+                gradient: 'from-emerald-400 via-teal-500 to-cyan-600',
+                badgeColor: 'bg-emerald-100 text-emerald-800',
+                meaning: 'ประตูสู่คอนเสิร์ตในฝันเปิดต้อนรับท่านแล้ว การชำระเงินและยืนยันสิทธิ์จะผ่านฉลุยไม่มีสะดุด',
+                svgArt: `<svg viewBox="0 0 120 120" class="w-20 h-20 mx-auto"><circle cx="60" cy="60" r="46" fill="#d1fae5"/><circle cx="46" cy="60" r="14" fill="none" stroke="#059669" stroke-width="6"/><path d="M60 60h32M80 60v12M90 60v9" stroke="#059669" stroke-width="6" stroke-linecap="round"/></svg>`
+            },
+            {
+                id: 9,
+                roman: 'IX',
+                name: 'ไพ่หัวใจสีฟ้าผูกพัน',
+                subtitle: 'Eternal Fanclub Heart',
+                gradient: 'from-sky-400 via-blue-500 to-cyan-500',
+                badgeColor: 'bg-sky-100 text-sky-700',
+                meaning: 'สายสัมพันธ์ระหว่างท่านกับศิลปินเหนียวแน่นมาก ดวงสมพงษ์กันสุดๆ มีเกณฑ์ได้สบตาหรือได้โมเมนต์ประทับใจ',
+                svgArt: `<svg viewBox="0 0 120 120" class="w-20 h-20 mx-auto"><circle cx="60" cy="60" r="46" fill="#e0f2fe"/><path d="M60 88S28 67 28 46a17 17 0 0 1 32-8 17 17 0 0 1 32 8c0 21-32 42-32 42z" fill="#0ea5e9" stroke="#fff" stroke-width="3"/></svg>`
+            },
+            {
+                id: 10,
+                roman: 'X',
+                name: 'ไพ่กงล้อแห่งความโชคดี',
+                subtitle: 'Wheel of Lucky Seats',
+                gradient: 'from-violet-400 via-fuchsia-500 to-rose-500',
+                badgeColor: 'bg-purple-100 text-purple-800',
+                meaning: 'วงล้อแห่งโชคหมุนมาหยุดที่เลขที่นั่งมงคล ไม่ว่าจะสุ่มได้แถวไหนก็เป็นทำเลทองที่เห็นเวทีชัดเจน',
+                svgArt: `<svg viewBox="0 0 120 120" class="w-20 h-20 mx-auto"><circle cx="60" cy="60" r="46" fill="#f3e8ff"/><circle cx="60" cy="60" r="28" fill="none" stroke="#9333ea" stroke-width="6"/><path d="M60 32v56M32 60h56M40 40l40 40M80 40L40 80" stroke="#c084fc" stroke-width="3"/><circle cx="60" cy="60" r="8" fill="#fbbf24"/></svg>`
+            },
+            {
+                id: 11,
+                roman: 'XI',
+                name: 'ไพ่กล่องของขวัญเซอร์ไพรส์',
+                subtitle: 'Sweet Surprise Gift',
+                gradient: 'from-pink-400 via-rose-400 to-amber-400',
+                badgeColor: 'bg-pink-100 text-pink-800',
+                meaning: 'จะมีข่าวดีเรื่องบัตรเข้ามาแบบไม่ทันตั้งตัว อาจได้อัปเกรดโซนที่ดีกว่าที่คิด หรือได้สิทธิ์ลุ้นเบเนฟิตเพิ่ม',
+                svgArt: `<svg viewBox="0 0 120 120" class="w-20 h-20 mx-auto"><circle cx="60" cy="60" r="46" fill="#fce7f3"/><rect x="34" y="50" width="52" height="36" rx="6" fill="#ec4899"/><rect x="30" y="42" width="60" height="12" rx="4" fill="#f472b6"/><path d="M60 42v44M34 66h52" stroke="#fde047" stroke-width="5"/></svg>`
+            },
+            {
+                id: 12,
+                roman: 'XII',
+                name: 'ไพ่ใบโคลเวอร์สี่แฉกสีมิ้นต์',
+                subtitle: 'Four-Leaf Mint Clover',
+                gradient: 'from-emerald-400 via-green-500 to-teal-600',
+                badgeColor: 'bg-green-100 text-green-800',
+                meaning: 'สัญลักษณ์แห่งความโชคดี 4 ประการ: คิวไว โซนสวย ราคาถูกใจ และกดได้ครบตามจำนวนใบที่ต้องการ',
+                svgArt: `<svg viewBox="0 0 120 120" class="w-20 h-20 mx-auto"><circle cx="60" cy="60" r="46" fill="#dcfce7"/><circle cx="48" cy="48" r="13" fill="#10b981"/><circle cx="72" cy="48" r="13" fill="#34d399"/><circle cx="48" cy="72" r="13" fill="#34d399"/><circle cx="72" cy="72" r="13" fill="#10b981"/><path d="M60 72c0 12-6 18-12 20" stroke="#047857" stroke-width="4" fill="none" stroke-linecap="round"/></svg>`
+            },
+            {
+                id: 13,
+                roman: 'XIII',
+                name: 'ไพ่มงกุฎเจ้าหญิงคอนเสิร์ต',
+                subtitle: 'Concert Royal Crown',
+                gradient: 'from-amber-400 via-yellow-500 to-orange-500',
+                badgeColor: 'bg-yellow-100 text-yellow-800',
+                meaning: 'ราศีผู้ชนะจับเต็มเปี่ยม! ท่านจะสมหวังราวกับเจ้าหญิงที่ได้ครอบครองบัตรใบสำคัญที่สุดของงานนี้',
+                svgArt: `<svg viewBox="0 0 120 120" class="w-20 h-20 mx-auto"><circle cx="60" cy="60" r="46" fill="#fef9c3"/><path d="M28 76l8-34 24 18 24-18 8 34H28z" fill="#eab308" stroke="#fff" stroke-width="2.5" stroke-linejoin="round"/><circle cx="36" cy="38" r="4" fill="#38bdf8"/><circle cx="60" cy="34" r="5" fill="#f43f5e"/><circle cx="84" cy="38" r="4" fill="#38bdf8"/></svg>`
+            },
+            {
+                id: 14,
+                roman: 'XIV',
+                name: 'ไพ่คลื่นทะเลสีครามสงบสุข',
+                subtitle: 'Calm Blue Ocean Flow',
+                gradient: 'from-blue-400 via-sky-500 to-teal-500',
+                badgeColor: 'bg-blue-100 text-blue-700',
+                meaning: 'ทุกอย่างจะราบรื่นเหมือนสายน้ำไหล ไม่ต้องกังวลใจ ฝากคิวแล้วนั่งรอรับข่าวดีสวยๆ ได้เลย',
+                svgArt: `<svg viewBox="0 0 120 120" class="w-20 h-20 mx-auto"><circle cx="60" cy="60" r="46" fill="#dbeafe"/><path d="M24 54c12-10 24 10 36 0s24 10 36 0M24 70c12-10 24 10 36 0s24 10 36 0" fill="none" stroke="#0284c7" stroke-width="6" stroke-linecap="round"/></svg>`
+            },
+            {
+                id: 15,
+                roman: 'XV',
+                name: 'ไพ่พลุเฉลิมฉลองแห่งชัยชนะ',
+                subtitle: 'Victory Celebration Spark',
+                gradient: 'from-sky-400 via-indigo-500 to-rose-500',
+                badgeColor: 'bg-indigo-100 text-indigo-700',
+                meaning: 'เตรียมจุดพลุฉลองได้เลย! ดวงความสำเร็จพุ่งทะยานสูงสุด มีโอกาสได้บัตรครบทั้งแก๊งไปสนุกด้วยกัน',
+                svgArt: `<svg viewBox="0 0 120 120" class="w-20 h-20 mx-auto"><circle cx="60" cy="60" r="46" fill="#eef2ff"/><path d="M60 26v20M60 74v20M26 60h20M74 60h20M36 36l14 14M70 70l14 14M84 36L70 50M50 70L36 84" stroke="#f59e0b" stroke-width="5" stroke-linecap="round"/><circle cx="60" cy="60" r="9" fill="#38bdf8"/></svg>`
+            }
+        ];
+
+        let fortuneState = {
+            drawnThreeCards: [],
+            selectedIndices: [],
+            isRevealed: false
+        };
+
+        /**
+         * ============================================================================
+         * CORE HELPER FUNCTIONS
+         * ============================================================================
+         */
+        function getCurrentUser() {
+            if (!state.currentUserId) return null;
+            return db.users.find(u => u.id === state.currentUserId) || null;
+        }
+
+        function isMasterAdmin(user) {
+            return user && user.username === 'Bonnyticket' && user.password === '0934909361';
+        }
+
+        function generateUniqueMemberId() {
+            let candidate = '';
+            let exists = true;
+            while (exists) {
+                const randNum = Math.floor(100000 + Math.random() * 900000);
+                candidate = `BNY-${randNum}`;
+                exists = db.users.some(u => u.memberId === candidate);
+            }
+            return candidate;
+        }
+
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            if (!container) return;
+            const colors = {
+                success: 'bg-emerald-500 text-white border-emerald-400',
+                error: 'bg-rose-500 text-white border-rose-400',
+                info: 'bg-bonny-600 text-white border-bonny-400'
+            };
+            const toast = document.createElement('div');
+            toast.className = `${colors[type] || colors.info} px-4 py-3 rounded-2xl shadow-lg border text-xs font-bold flex items-center justify-between gap-2 pointer-events-auto transition-all duration-300`;
+            toast.innerHTML = `<span>${message}</span><button onclick="this.parentElement.remove()" class="opacity-80 hover:opacity-100">✕</button>`;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                setTimeout(() => toast.remove(), 300);
+            }, 3400);
+        }
+
+        function openModal(htmlContent) {
+            const modal = document.getElementById('modal-container');
+            modal.innerHTML = htmlContent;
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('modal-container');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            modal.innerHTML = '';
+        }
+
+        function copyTextToClipboard(text, label = 'ข้อมูล') {
+            const tempInput = document.createElement('input');
+            tempInput.value = text;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempInput);
+            showToast(`คัดลอก${label}เรียบร้อย: ${text}`);
+        }
+
+        function renderBrandLogo(sizeClass = 'w-12 h-12') {
+            if (db.settings.logoUrl && db.settings.logoUrl.trim() !== '') {
+                return `<img src="${db.settings.logoUrl}" alt="${db.settings.siteName}" onerror="this.src='https://placehold.co/120x120/38bdf8/ffffff?text=BT'" class="${sizeClass} rounded-2xl object-cover border-2 border-white shadow-soft">`;
+            }
+            return `
+                <div class="${sizeClass} rounded-2xl bg-gradient-to-br from-sky-300 via-bonny-500 to-blue-600 flex items-center justify-center text-white shadow-soft border-2 border-white shrink-0">
+                    <svg class="w-3/5 h-3/5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/>
+                        <path d="M13 5v2"/><path d="M13 17v2"/><path d="M13 11v2"/>
+                    </svg>
+                </div>
+            `;
+        }
+
+        function renderCuteSkyWave() {
+            return `
+                <div class="w-full overflow-hidden leading-none pointer-events-none -mt-1">
+                    <svg class="w-full h-3 text-white/90" viewBox="0 0 1200 30" preserveAspectRatio="none" fill="currentColor">
+                        <path d="M0,0 L1200,0 L1200,10 Q1150,30 1100,10 Q1050,30 1000,10 Q950,30 900,10 Q850,30 800,10 Q750,30 700,10 Q650,30 600,10 Q550,30 500,10 Q450,30 400,10 Q350,30 300,10 Q250,30 200,10 Q150,30 100,10 Q50,30 0,10 Z"/>
+                    </svg>
+                </div>
+            `;
+        }
+
+        /**
+         * ============================================================================
+         * AUTHENTICATION VIEWS & HANDLERS (MANUAL INPUT ONLY)
+         * ============================================================================
+         */
+        function renderAuthView() {
+            return `
+                <div class="flex-1 flex flex-col items-center justify-center px-4 py-8">
+                    <div class="w-full max-w-md bg-white/95 backdrop-blur-md rounded-3xl shadow-cloud border-2 border-white p-6 sm:p-8">
+                        <!-- Brand Header (Editable from Back-Office) -->
+                        <div class="flex flex-col items-center text-center mb-6">
+                            <div class="cute-bob mb-3">${renderBrandLogo('w-16 h-16')}</div>
+                            <div class="inline-flex items-center gap-1.5 bg-bonny-50 text-bonny-600 px-3 py-1 rounded-full text-xs font-bold mb-1.5 border border-bonny-200">
+                                <span>☁️</span> Sky Cloud Ticket Service
+                            </div>
+                            <h1 class="text-2xl font-extrabold text-bonny-600">${db.settings.siteName}</h1>
+                            <p class="text-xs text-slate-500 mt-1.5 leading-relaxed">${db.settings.siteDescription}</p>
+                        </div>
+
+                        <!-- Mode Switcher Tabs -->
+                        <div class="grid grid-cols-2 gap-1.5 bg-bonny-50 p-1.5 rounded-2xl mb-6 border border-bonny-100">
+                            <button type="button" onclick="setAuthMode('login')"
+                                class="py-2.5 rounded-xl text-xs font-extrabold transition-all ${state.authMode === 'login' ? 'bg-bonny-500 text-white shadow-soft' : 'text-slate-600 hover:text-bonny-600'}">
+                                เข้าสู่ระบบ
+                            </button>
+                            <button type="button" onclick="setAuthMode('register')"
+                                class="py-2.5 rounded-xl text-xs font-extrabold transition-all ${state.authMode === 'register' ? 'bg-bonny-500 text-white shadow-soft' : 'text-slate-600 hover:text-bonny-600'}">
+                                สมัครสมาชิกใหม่
+                            </button>
+                        </div>
+
+                        ${state.authMode === 'login' ? renderLoginForm() :
+                          state.authMode === 'register' ? renderRegisterForm() :
+                          renderForgotPasswordForm()}
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderLoginForm() {
+            return `
+                <form onsubmit="handleLogin(event)" class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1.5">ชื่อผู้ใช้งาน (Username)</label>
+                        <input type="text" id="login-username" required placeholder="กรอกชื่อผู้ใช้งานของคุณ"
+                            class="w-full px-4 py-3 rounded-2xl bg-slate-50 border border-slate-200 focus:border-bonny-400 focus:bg-white focus:outline-none text-sm">
+                    </div>
+                    <div>
+                        <div class="flex items-center justify-between mb-1.5">
+                            <label class="block text-xs font-bold text-slate-700">รหัสผ่าน</label>
+                            <button type="button" onclick="setAuthMode('forgot')" class="text-xs font-bold text-bonny-600 hover:underline">
+                                ลืมรหัสผ่าน?
+                            </button>
+                        </div>
+                        <input type="password" id="login-password" required placeholder="กรอกรหัสผ่าน"
+                            class="w-full px-4 py-3 rounded-2xl bg-slate-50 border border-slate-200 focus:border-bonny-400 focus:bg-white focus:outline-none text-sm">
+                    </div>
+                    <button type="submit"
+                        class="w-full py-3.5 rounded-2xl bg-gradient-to-r from-sky-400 to-bonny-600 hover:from-sky-500 hover:to-bonny-700 text-white font-extrabold text-sm shadow-soft active:scale-98 transition-all">
+                        เข้าสู่ระบบ ☁️
+                    </button>
+                </form>
+            `;
+        }
+
+        function renderRegisterForm() {
+            return `
+                <form onsubmit="handleRegister(event)" class="space-y-3.5">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">1. ชื่อผู้ใช้งาน (Username)</label>
+                        <input type="text" id="reg-username" required placeholder="ตั้งชื่อผู้ใช้งานภาษาอังกฤษหรือตัวเลข"
+                            class="w-full px-4 py-2.5 rounded-2xl bg-slate-50 border border-slate-200 focus:border-bonny-400 focus:bg-white focus:outline-none text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">2. รหัสผ่าน [ตัวเลข 6 หลัก]</label>
+                        <input type="password" id="reg-password" required maxlength="6" pattern="\\d{6}" inputmode="numeric" placeholder="กรอกตัวเลข 6 หลัก เช่น 123456"
+                            class="w-full px-4 py-2.5 rounded-2xl bg-slate-50 border border-slate-200 focus:border-bonny-400 focus:bg-white focus:outline-none text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">3. ชื่อ - นามสกุล</label>
+                        <input type="text" id="reg-fullname" required placeholder="กรอกชื่อและนามสกุลจริง"
+                            class="w-full px-4 py-2.5 rounded-2xl bg-slate-50 border border-slate-200 focus:border-bonny-400 focus:bg-white focus:outline-none text-sm">
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">4. เบอร์โทรศัพท์</label>
+                            <input type="tel" id="reg-phone" required placeholder="08XXXXXXXX"
+                                class="w-full px-4 py-2.5 rounded-2xl bg-slate-50 border border-slate-200 focus:border-bonny-400 focus:bg-white focus:outline-none text-sm">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">5. LINE ID</label>
+                            <input type="text" id="reg-line" required placeholder="ไอดีไลน์สำหรับติดต่อ"
+                                class="w-full px-4 py-2.5 rounded-2xl bg-slate-50 border border-slate-200 focus:border-bonny-400 focus:bg-white focus:outline-none text-sm">
+                        </div>
+                    </div>
+                    <div>
+                        <div class="flex items-center justify-between mb-1">
+                            <label class="block text-xs font-bold text-slate-700">6. รหัสลูกค้า (ขอรับจากแอดมิน)</label>
+                            <a href="${db.settings.adminLineUrl}" target="_blank" class="text-[11px] font-bold text-emerald-600 hover:underline">
+                                ขอรับรหัสลูกค้าคลิกที่นี่ ↗
+                            </a>
+                        </div>
+                        <input type="text" id="reg-invite" required placeholder="กรอกรหัสลูกค้าที่ได้รับจากแอดมิน"
+                            class="w-full px-4 py-2.5 rounded-2xl bg-sky-50/70 border border-bonny-200 focus:border-bonny-400 focus:bg-white focus:outline-none text-sm uppercase">
+                    </div>
+                    <button type="submit"
+                        class="w-full py-3.5 rounded-2xl bg-gradient-to-r from-sky-400 to-bonny-600 hover:from-sky-500 hover:to-bonny-700 text-white font-extrabold text-sm shadow-soft active:scale-98 transition-all mt-2">
+                        ยืนยันสมัครสมาชิก ✨
+                    </button>
+                </form>
+            `;
+        }
+
+        function renderForgotPasswordForm() {
+            return `
+                <form onsubmit="handleForgotPassword(event)" class="space-y-4">
+                    <div class="bg-sky-50 border border-bonny-200 rounded-2xl p-3 text-xs text-bonny-700">
+                        กรอก <strong>ชื่อ-นามสกุล</strong> และ <strong>เบอร์โทรศัพท์</strong> ที่ลงทะเบียนไว้เพื่อตั้งรหัสผ่าน 6 หลักใหม่ทันที
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">ชื่อ - นามสกุล ที่ลงทะเบียนไว้</label>
+                        <input type="text" id="forgot-fullname" required placeholder="กรอกชื่อ-นามสกุลให้ตรงกับตอนสมัคร"
+                            class="w-full px-4 py-2.5 rounded-2xl bg-slate-50 border border-slate-200 focus:border-bonny-400 focus:bg-white focus:outline-none text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">เบอร์โทรศัพท์</label>
+                        <input type="tel" id="forgot-phone" required placeholder="กรอกเบอร์โทรศัพท์ที่ใช้สมัคร"
+                            class="w-full px-4 py-2.5 rounded-2xl bg-slate-50 border border-slate-200 focus:border-bonny-400 focus:bg-white focus:outline-none text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">ตั้งรหัสผ่านใหม่ [ตัวเลข 6 หลัก]</label>
+                        <input type="password" id="forgot-newpass" required maxlength="6" pattern="\\d{6}" inputmode="numeric" placeholder="กรอกรหัสผ่านใหม่ 6 หลัก"
+                            class="w-full px-4 py-2.5 rounded-2xl bg-slate-50 border border-slate-200 focus:border-bonny-400 focus:bg-white focus:outline-none text-sm">
+                    </div>
+                    <div class="flex gap-2">
+                        <button type="button" onclick="setAuthMode('login')" class="w-1/3 py-3 rounded-2xl bg-slate-100 text-slate-600 font-bold text-xs hover:bg-slate-200">
+                            ย้อนกลับ
+                        </button>
+                        <button type="submit" class="w-2/3 py-3 rounded-2xl bg-bonny-500 hover:bg-bonny-600 text-white font-extrabold text-xs shadow-soft">
+                            รีเซ็ตรหัสผ่านทันที
+                        </button>
+                    </div>
+                </form>
+            `;
+        }
+
+        function setAuthMode(mode) {
+            state.authMode = mode;
+            renderApp();
+        }
+
+        function handleLogin(e) {
+            e.preventDefault();
+            const username = document.getElementById('login-username').value.trim();
+            const password = document.getElementById('login-password').value.trim();
+            const user = db.users.find(u => u.username.toLowerCase() === username.toLowerCase() && u.password === password);
+            if (!user) {
+                showToast('ชื่อผู้ใช้งานหรือรหัสผ่านไม่ถูกต้อง', 'error');
+                return;
+            }
+            state.currentUserId = user.id;
+            state.viewMode = 'customer';
+            state.activeTab = 'home';
+            sessionStorage.setItem('bonny_current_user', user.id);
+            showToast(`ยินดีต้อนรับคุณ ${user.fullName} ☁️`);
+            renderApp();
+        }
+
+        function handleRegister(e) {
+            e.preventDefault();
+            const username = document.getElementById('reg-username').value.trim();
+            const password = document.getElementById('reg-password').value.trim();
+            const fullName = document.getElementById('reg-fullname').value.trim();
+            const phone = document.getElementById('reg-phone').value.trim();
+            const lineId = document.getElementById('reg-line').value.trim();
+            const inviteCode = document.getElementById('reg-invite').value.trim().toUpperCase();
+
+            if (!/^\d{6}$/.test(password)) {
+                showToast('รหัสผ่านต้องเป็นตัวเลข 6 หลักเท่านั้น', 'error');
+                return;
+            }
+            if (db.users.some(u => u.username.toLowerCase() === username.toLowerCase())) {
+                showToast('ชื่อผู้ใช้งานนี้ถูกใช้แล้ว กรุณาใช้ชื่ออื่น', 'error');
+                return;
+            }
+            const validCode = db.inviteCodes.find(c => c.code.toUpperCase() === inviteCode && c.active);
+            if (!validCode) {
+                showToast('รหัสลูกค้าไม่ถูกต้องหรือถูกปิดใช้งาน กรุณาติดต่อแอดมิน', 'error');
+                return;
+            }
+
+            const newUser = {
+                id: 'USR-' + Date.now(),
+                username,
+                password,
+                fullName,
+                phone,
+                lineId,
+                inviteCode,
+                memberId: generateUniqueMemberId(),
+                points: 0,
+                addresses: [],
+                refundBank: { bankName: '', accountNumber: '', accountName: '' }
+            };
+
+            db.users.push(newUser);
+            saveDB();
+
+            state.currentUserId = newUser.id;
+            state.viewMode = 'customer';
+            state.activeTab = 'home';
+            sessionStorage.setItem('bonny_current_user', newUser.id);
+            showToast(`สมัครสมาชิกสำเร็จ! รหัสสมาชิกของคุณคือ ${newUser.memberId}`);
+            renderApp();
+        }
+
+        function handleForgotPassword(e) {
+            e.preventDefault();
+            const fullName = document.getElementById('forgot-fullname').value.trim();
+            const phone = document.getElementById('forgot-phone').value.trim();
+            const newPass = document.getElementById('forgot-newpass').value.trim();
+
+            if (!/^\d{6}$/.test(newPass)) {
+                showToast('รหัสผ่านใหม่ต้องเป็นตัวเลข 6 หลักเท่านั้น', 'error');
+                return;
+            }
+            const user = db.users.find(u => u.fullName === fullName && u.phone === phone);
+            if (!user) {
+                showToast('ไม่พบข้อมูลชื่อ-นามสกุล และเบอร์โทรศัพท์นี้ในระบบ', 'error');
+                return;
+            }
+            user.password = newPass;
+            saveDB();
+            state.authMode = 'login';
+            showToast('รีเซ็ตรหัสผ่านเรียบร้อยแล้ว กรุณาเข้าสู่ระบบด้วยรหัสใหม่');
+            renderApp();
+        }
+
+        function handleLogout() {
+            state.currentUserId = null;
+            state.viewMode = 'customer';
+            state.bookingStepData = null;
+            state.checkoutData = null;
+            sessionStorage.removeItem('bonny_current_user');
+            showToast('ออกจากระบบเรียบร้อยแล้ว', 'info');
+            renderApp();
+        }
+
+        /**
+         * ============================================================================
+         * CUSTOMER MAIN LAYOUT & 5 NAVIGATION MENUS
+         * ============================================================================
+         */
+        function renderCustomerShell(user) {
+            const navItems = [
+                { id: 'home', label: '1. จองคิว', emoji: '☁️', activeBg: 'bg-sky-500 text-white shadow-soft', inactiveText: 'text-sky-600' },
+                { id: 'bookings', label: '2. รายการจอง', emoji: '📋', activeBg: 'bg-indigo-500 text-white shadow-soft', inactiveText: 'text-indigo-600' },
+                { id: 'tickets', label: '3. บัตรของฉัน', emoji: '🎫', activeBg: 'bg-teal-500 text-white shadow-soft', inactiveText: 'text-teal-600' },
+                { id: 'member', label: '4. บัตรสมาชิก', emoji: '👑', activeBg: 'bg-amber-500 text-white shadow-soft', inactiveText: 'text-amber-600' },
+                { id: 'profile', label: '5. ฉัน', emoji: '🩵', activeBg: 'bg-blue-600 text-white shadow-soft', inactiveText: 'text-blue-600' }
+            ];
+
+            return `
+                <header class="sticky top-0 z-30">
+                    <div class="glass-nav border-b border-bonny-100/80">
+                        <div class="max-w-4xl mx-auto px-4 h-16 flex items-center justify-between">
+                            <div onclick="switchCustomerTab('home')" class="flex items-center gap-3 cursor-pointer group">
+                                ${renderBrandLogo('w-10 h-10 group-hover:scale-105 transition-transform')}
+                                <div>
+                                    <div class="flex items-center gap-1.5">
+                                        <h1 class="text-lg font-extrabold text-bonny-600 leading-none">${db.settings.siteName}</h1>
+                                        <span class="text-xs">☁️</span>
+                                    </div>
+                                    <span class="text-[11px] text-slate-500 font-medium">Sky Cloud Ticket Queue</span>
+                                </div>
+                            </div>
+
+                            <div class="flex items-center gap-2">
+                                <button onclick="toggleSparkleEffect()" title="เปิด/ปิดเอฟเฟกต์ดาววิบวับ"
+                                    class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-full text-[11px] font-bold border transition-all ${state.sparklesEnabled ? 'bg-sky-50 border-sky-200 text-sky-600 shadow-2xs' : 'bg-slate-50 border-slate-200 text-slate-400'}">
+                                    <span>${state.sparklesEnabled ? '✨' : '☁️'}</span>
+                                    <span class="hidden sm:inline">${state.sparklesEnabled ? 'วิบวับ: เปิด' : 'วิบวับ: ปิด'}</span>
+                                </button>
+                                ${isMasterAdmin(user) ? `
+                                    <button onclick="switchToAdmin()" class="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-900 text-white text-xs font-bold hover:bg-slate-800 transition-colors shadow-xs">
+                                        <span>🛡️</span> หลังบ้าน
+                                    </button>
+                                ` : ''}
+                                <div onclick="switchCustomerTab('member')" class="cursor-pointer flex items-center gap-1.5 bg-gradient-to-r from-bonny-50 to-amber-50 border border-bonny-200 px-3.5 py-1.5 rounded-full shadow-2xs hover:scale-105 transition-transform">
+                                    <span class="text-xs">⭐</span>
+                                    <span class="text-xs font-extrabold text-bonny-700">${user.points.toLocaleString()} แต้ม</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    ${renderCuteSkyWave()}
+                </header>
+
+                <!-- Cute Scrolling Sky Ticker Bar -->
+                <div class="max-w-4xl w-full mx-auto px-4 pt-2">
+                    <div class="bg-white/90 backdrop-blur-xs border border-bonny-200/80 rounded-full py-1.5 px-3 shadow-2xs flex items-center gap-2 overflow-hidden">
+                        <span class="bg-bonny-500 text-white text-[10px] font-extrabold px-2.5 py-0.5 rounded-full shrink-0 flex items-center gap-1">
+                            <span>☁️</span> LIVE
+                        </span>
+                        <div class="overflow-hidden flex-1 relative">
+                            <div class="animate-marquee text-xs font-medium text-slate-600">
+                                <span class="mx-4">✨ ${db.settings.announcement}</span>
+                                <span class="mx-4 text-bonny-600 font-semibold">🩵 (｡•̀ᴗ-)✧ จองคิวกดบัตรล่วงหน้า มั่นใจ ปลอดภัย 100%</span>
+                                <span class="mx-4">🎁 สะสมแต้มครบ แลกส่วนลดและของรางวัลสุดน่ารักได้ในเมนู 4. บัตรสมาชิก</span>
+                                <span class="mx-4">✨ ${db.settings.announcement}</span>
+                                <span class="mx-4 text-bonny-600 font-semibold">🩵 (｡•̀ᴗ-)✧ จองคิวกดบัตรล่วงหน้า มั่นใจ ปลอดภัย 100%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Main Content Area -->
+                <main class="flex-1 max-w-4xl w-full mx-auto px-4 pt-3 pb-28">
+                    ${state.checkoutData ? renderCheckoutStepView(user) :
+                      state.bookingStepData ? renderBookingWizardView(user) :
+                      renderActiveCustomerTab(user)}
+                </main>
+
+                <!-- Floating Cute Cloud Mascot Helper -->
+                ${renderCloudMascotWidget()}
+
+                <!-- Cute Pastel Multi-Color Bottom Navigation Bar (5 Menus) -->
+                <nav class="fixed bottom-0 inset-x-0 z-30 glass-nav border-t-2 border-bonny-100 shadow-cloud">
+                    <div class="max-w-4xl mx-auto px-2 py-2 grid grid-cols-5 gap-1.5">
+                        ${navItems.map(item => {
+                            const isActive = !state.bookingStepData && !state.checkoutData && state.activeTab === item.id;
+                            return `
+                                <button onclick="switchCustomerTab('${item.id}')"
+                                    class="flex flex-col items-center justify-center py-2 px-1 rounded-2xl transition-all ${isActive ? item.activeBg + ' -translate-y-0.5' : 'hover:bg-bonny-50 ' + item.inactiveText}">
+                                    <span class="text-base leading-none mb-1">${item.emoji}</span>
+                                    <span class="text-[10.5px] sm:text-xs font-extrabold tracking-tight truncate max-w-full">${item.label}</span>
+                                </button>
+                            `;
+                        }).join('')}
+                    </div>
+                </nav>
+            `;
+        }
+
+        function switchCustomerTab(tabId) {
+            state.activeTab = tabId;
+            state.bookingStepData = null;
+            state.checkoutData = null;
+            renderApp();
+        }
+
+        function renderActiveCustomerTab(user) {
+            switch (state.activeTab) {
+                case 'home': return renderHomeEventsTab(user);
+                case 'bookings': return renderMyBookingsTab(user);
+                case 'tickets': return renderMyTicketsTab(user);
+                case 'member': return renderMemberCardTab(user);
+                case 'profile': return renderProfileTab(user);
+                default: return renderHomeEventsTab(user);
+            }
+        }
+
+        /**
+         * ============================================================================
+         * TAB 1: จองคิว (EVENT LISTING + 15-CARD FORTUNE READING + 9-STEP CHECKOUT)
+         * ============================================================================
+         */
+        function renderHomeEventsTab(user) {
+            const activeEvents = db.events.filter(ev => ev.active);
+            return `
+                <div class="space-y-4">
+                    <!-- Welcome & Fluffy Cloud Announcement Banner -->
+                    <div class="sky-banner-gradient rounded-3xl p-5 sm:p-6 text-white shadow-soft relative overflow-hidden border-2 border-white">
+                        <div class="relative z-10">
+                            <div class="flex flex-wrap items-center justify-between gap-2 mb-2.5">
+                                <div class="inline-flex items-center gap-1.5 bg-white/25 backdrop-blur-xs px-3.5 py-1 rounded-full text-xs font-bold border border-white/30">
+                                    <span>☁️</span> ประกาศจาก ${db.settings.siteName}
+                                </div>
+                                <span class="text-[11px] font-bold bg-white text-bonny-600 px-3 py-1 rounded-full shadow-2xs flex items-center gap-1">
+                                    <span>🌤️</span> พยากรณ์กดบัตร: ท้องฟ้าแจ่มใส 99.9%
+                                </span>
+                            </div>
+                            <h2 class="text-lg sm:text-xl font-extrabold leading-snug mb-1">สวัสดีคุณ ${user.fullName} 🩵</h2>
+                            <p class="text-xs sm:text-sm text-sky-50 leading-relaxed">${db.settings.announcement}</p>
+                        </div>
+                        <svg class="absolute -right-6 -bottom-5 w-44 h-24 text-white/25 pointer-events-none" viewBox="0 0 200 100" fill="currentColor">
+                            <path d="M35 85h130a25 25 0 0 0 4-49.7A38 38 0 0 0 96 22a32 32 0 0 0-58 17A24 24 0 0 0 35 85z"/>
+                        </svg>
+                    </div>
+
+                    <!-- Interactive 15-Card Fortune Tarot Reading Banner -->
+                    <div class="bg-white/95 rounded-3xl p-4 border-2 border-indigo-100 shadow-card relative overflow-hidden">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                            <div class="flex items-center gap-3">
+                                <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-100 via-purple-50 to-pink-100 border border-indigo-200 flex items-center justify-center text-2xl shrink-0 cute-bob shadow-2xs">
+                                    🔮
+                                </div>
+                                <div>
+                                    <div class="flex items-center gap-1.5">
+                                        <span class="text-[10px] font-extrabold uppercase tracking-wider bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded-full">15 Tarot Cards</span>
+                                        <h3 class="text-sm font-extrabold text-slate-800">เสี่ยงทายดวงกดบัตรประจำวัน</h3>
+                                    </div>
+                                    <p class="text-xs text-slate-500 mt-0.5">ตั้งจิตอธิษฐานแล้วเลือกไพ่มงคล 3 ใบจากสำรับ 15 ใบ เพื่อเปิดดูคำทำนายโซนหน้าเวที!</p>
+                                </div>
+                            </div>
+                            <button type="button" onclick="openFortuneCardModal(event)"
+                                class="shrink-0 px-5 py-3 rounded-2xl bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 hover:from-indigo-600 hover:to-pink-600 text-white text-xs font-extrabold shadow-soft active:scale-95 transition-all flex items-center justify-center gap-1.5">
+                                <span>🃏</span> กดดูดวง (เลือกไพ่ 3 ใบ)
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Event List Heading -->
+                    <div class="flex items-center justify-between pt-1">
+                        <div class="flex items-center gap-2">
+                            <span class="text-lg">☁️</span>
+                            <h3 class="text-base font-extrabold text-slate-800">งานที่เปิดรับจองคิวขณะนี้</h3>
+                        </div>
+                        <span class="text-xs font-bold text-bonny-700 bg-white px-3 py-1 rounded-full border border-bonny-200 shadow-2xs">
+                            ✨ เปิดรับ ${activeEvents.length} งาน
+                        </span>
+                    </div>
+
+                    ${activeEvents.length === 0 ? `
+                        <div class="bg-white rounded-3xl p-10 text-center border-2 border-white shadow-card">
+                            <div class="text-4xl mb-2">☁️</div>
+                            <p class="text-sm font-bold text-slate-600">ยังไม่มีงานที่เปิดรับจองคิวในขณะนี้</p>
+                        </div>
+                    ` : `
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            ${activeEvents.map(ev => `
+                                <div class="bg-white rounded-3xl overflow-hidden border-2 border-white shadow-card hover:shadow-cloud transition-all flex flex-col justify-between group">
+                                    <div>
+                                        <div class="relative aspect-16/9 bg-bonny-100 overflow-hidden">
+                                            <img src="${ev.image}" alt="${ev.title}"
+                                                onerror="this.src='https://placehold.co/800x450/38bdf8/ffffff?text=BONNYTICKET'"
+                                                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                                            <span class="absolute top-3 left-3 bg-white/95 backdrop-blur-xs text-bonny-600 text-[11px] font-extrabold px-3 py-1 rounded-full shadow-xs border border-bonny-100">
+                                                ☁️ มัดจำ ${Number(ev.depositPerTicket).toLocaleString()} ฿ / ใบ
+                                            </span>
+                                            <span class="absolute bottom-3 right-3 bg-sky-500/90 text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full">
+                                                พร้อมกดคิว ✨
+                                            </span>
+                                        </div>
+                                        <div class="p-4">
+                                            <h4 class="font-extrabold text-slate-800 text-base line-clamp-2 mb-2 group-hover:text-bonny-600 transition-colors">${ev.title}</h4>
+                                            <div class="space-y-1 text-xs text-slate-500">
+                                                <p class="flex items-center gap-1.5"><span>📅</span> ${ev.dates.join(' / ')}</p>
+                                                <p class="flex items-center gap-1.5"><span>🎟️</span> บัตร ${ev.prices.length} ราคาให้เลือก</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="px-4 pb-4">
+                                        <button onclick="startBookingWizard('${ev.id}')"
+                                            class="w-full py-3 rounded-2xl bg-gradient-to-r from-sky-400 to-bonny-600 hover:from-sky-500 hover:to-bonny-700 text-white font-extrabold text-xs shadow-soft active:scale-98 transition-all flex items-center justify-center gap-1.5">
+                                            <span>☁️</span> เลือกจองคิวงานนี้
+                                        </button>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    `}
+                </div>
+            `;
+        }
+
+        /**
+         * ============================================================================
+         * 9-STEP BOOKING & PAYMENT FLOW
+         * ============================================================================
+         */
+        function startBookingWizard(eventId) {
+            const ev = db.events.find(item => item.id === eventId);
+            if (!ev) return;
+            state.bookingStepData = {
+                event: ev,
+                quantity: 1,
+                selectedPrice: ev.prices[0] || 'บัตรทั่วไป',
+                selectedDate: ev.dates[0] || 'รอบการแสดงปกติ',
+                agreedRules: false
+            };
+            renderApp();
+        }
+
+        function updateWizardField(field, value) {
+            if (!state.bookingStepData) return;
+            state.bookingStepData[field] = value;
+            renderApp();
+        }
+
+        function adjustWizardQuantity(delta) {
+            if (!state.bookingStepData) return;
+            const nextQty = Math.max(1, Math.min(10, state.bookingStepData.quantity + delta));
+            state.bookingStepData.quantity = nextQty;
+            renderApp();
+        }
+
+        function renderBookingWizardView(user) {
+            const data = state.bookingStepData;
+            const ev = data.event;
+            const totalDeposit = data.quantity * Number(ev.depositPerTicket);
+
+            return `
+                <div class="space-y-4">
+                    <button onclick="switchCustomerTab('home')" class="inline-flex items-center gap-1.5 text-xs font-extrabold text-bonny-600 bg-white px-3.5 py-2 rounded-full border border-bonny-200 shadow-2xs hover:bg-bonny-50">
+                        ← กลับไปเลือกงานอื่น
+                    </button>
+
+                    <div class="bg-white rounded-3xl overflow-hidden border-2 border-white shadow-cloud">
+                        <div class="relative h-48 sm:h-60 bg-bonny-100">
+                            <img src="${ev.image}" alt="${ev.title}" onerror="this.src='https://placehold.co/800x450/38bdf8/ffffff?text=EVENT'" class="w-full h-full object-cover">
+                            <div class="absolute inset-0 bg-gradient-to-t from-slate-900/75 via-transparent to-transparent flex items-end p-5">
+                                <div class="text-white">
+                                    <span class="bg-bonny-500 text-[11px] font-extrabold px-2.5 py-0.5 rounded-full">ขั้นตอนจองคิวกดบัตร</span>
+                                    <h2 class="text-lg sm:text-xl font-extrabold mt-1">${ev.title}</h2>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="p-5 sm:p-6 space-y-5">
+                            <!-- Step 2: Select Quantity -->
+                            <div class="bg-sky-50/70 p-4 rounded-2xl border border-bonny-100 flex items-center justify-between">
+                                <div>
+                                    <span class="text-xs font-extrabold text-bonny-700">ขั้นตอนที่ 2 • เลือกจำนวนบัตรที่ต้องการ</span>
+                                    <p class="text-[11px] text-slate-500">มัดจำใบละ ${Number(ev.depositPerTicket).toLocaleString()} บาท</p>
+                                </div>
+                                <div class="flex items-center gap-3 bg-white px-3 py-1.5 rounded-2xl border border-bonny-200 shadow-2xs">
+                                    <button type="button" onclick="adjustWizardQuantity(-1)" class="w-7 h-7 rounded-xl bg-bonny-50 text-bonny-700 font-extrabold hover:bg-bonny-100">-</button>
+                                    <span class="text-base font-extrabold text-slate-800 w-6 text-center">${data.quantity}</span>
+                                    <button type="button" onclick="adjustWizardQuantity(1)" class="w-7 h-7 rounded-xl bg-bonny-500 text-white font-extrabold hover:bg-bonny-600">+</button>
+                                </div>
+                            </div>
+
+                            <!-- Step 3: Select Ticket Price / Zone -->
+                            <div>
+                                <label class="block text-xs font-extrabold text-slate-700 mb-2">ขั้นตอนที่ 3 • เลือกราคาบัตร / โซนที่ต้องการ</label>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                    ${ev.prices.map(price => `
+                                        <button type="button" onclick="updateWizardField('selectedPrice', '${price.replace(/'/g, "\\'")}')"
+                                            class="p-3 rounded-2xl border text-left text-xs font-bold transition-all ${data.selectedPrice === price ? 'bg-bonny-500 text-white border-bonny-500 shadow-soft' : 'bg-slate-50 text-slate-700 border-slate-200 hover:border-bonny-300'}">
+                                            🎟️ ${price}
+                                        </button>
+                                    `).join('')}
+                                </div>
+                            </div>
+
+                            <!-- Step 4: Select Show Date -->
+                            <div>
+                                <label class="block text-xs font-extrabold text-slate-700 mb-2">ขั้นตอนที่ 4 • เลือกวันที่ / รอบการแสดง</label>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                    ${ev.dates.map(dt => `
+                                        <button type="button" onclick="updateWizardField('selectedDate', '${dt.replace(/'/g, "\\'")}')"
+                                            class="p-3 rounded-2xl border text-left text-xs font-bold transition-all ${data.selectedDate === dt ? 'bg-indigo-500 text-white border-indigo-500 shadow-soft' : 'bg-slate-50 text-slate-700 border-slate-200 hover:border-indigo-300'}">
+                                            📅 ${dt}
+                                        </button>
+                                    `).join('')}
+                                </div>
+                            </div>
+
+                            <!-- Step 5: Read Rules & Regulations -->
+                            <div class="bg-amber-50/80 border border-amber-200 rounded-2xl p-4 space-y-2">
+                                <h4 class="text-xs font-extrabold text-amber-800 flex items-center gap-1.5">
+                                    <span>📜</span> ขั้นตอนที่ 5 • อ่านกฎกติกาและเงื่อนไขการจองคิว
+                                </h4>
+                                <div class="text-xs text-slate-700 whitespace-pre-line leading-relaxed bg-white/80 p-3 rounded-xl border border-amber-100">
+                                    ${ev.rules || db.settings.globalBookingRules}
+                                </div>
+                            </div>
+
+                            <!-- Step 6: Checkbox Agree Rules -->
+                            <label class="flex items-start gap-3 p-3.5 rounded-2xl bg-bonny-50/80 border border-bonny-200 cursor-pointer select-none">
+                                <input type="checkbox" ${data.agreedRules ? 'checked' : ''} onchange="updateWizardField('agreedRules', this.checked)"
+                                    class="mt-0.5 w-4 h-4 accent-bonny-600 rounded">
+                                <span class="text-xs font-bold text-slate-700">
+                                    ขั้นตอนที่ 6 • ข้าพเจ้าได้อ่านกฎกติกาและยอมรับเงื่อนไขการจองคิวกดบัตรเรียบร้อยแล้ว
+                                </span>
+                            </label>
+
+                            <!-- Summary & Step 7: Proceed to Payment Account -->
+                            <div class="pt-2 border-t border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                                <div>
+                                    <span class="text-xs text-slate-500">ยอดมัดจำรวม (${data.quantity} ใบ x ${Number(ev.depositPerTicket).toLocaleString()} ฿)</span>
+                                    <div class="text-2xl font-extrabold text-bonny-600">${totalDeposit.toLocaleString()} บาท</div>
+                                </div>
+                                <button type="button" onclick="proceedToPaymentAccount()"
+                                    class="px-6 py-3.5 rounded-2xl bg-gradient-to-r from-sky-400 to-bonny-600 hover:from-sky-500 hover:to-bonny-700 text-white font-extrabold text-sm shadow-soft active:scale-98 transition-all">
+                                    ขั้นตอนที่ 7 • ยืนยันจองคิว & ชำระเงิน →
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function proceedToPaymentAccount() {
+            const data = state.bookingStepData;
+            if (!data) return;
+            if (!data.agreedRules) {
+                showToast('กรุณาติ๊กยอมรับกฎกติกาและเงื่อนไขก่อนกดจองคิว', 'error');
+                return;
+            }
+            const totalDeposit = data.quantity * Number(data.event.depositPerTicket);
+            state.checkoutData = {
+                event: data.event,
+                quantity: data.quantity,
+                selectedPrice: data.selectedPrice,
+                selectedDate: data.selectedDate,
+                totalDeposit,
+                slipBase64: ''
+            };
+            state.bookingStepData = null;
+            renderApp();
+        }
+
+        function renderCheckoutStepView(user) {
+            const ck = state.checkoutData;
+            return `
+                <div class="space-y-4">
+                    <button onclick="switchCustomerTab('home')" class="inline-flex items-center gap-1.5 text-xs font-extrabold text-slate-600 bg-white px-3.5 py-2 rounded-full border border-slate-200 shadow-2xs">
+                        ✕ ยกเลิกรายการนี้
+                    </button>
+
+                    <div class="bg-white rounded-3xl p-5 sm:p-6 border-2 border-white shadow-cloud space-y-5">
+                        <div class="text-center border-b border-bonny-100 pb-4">
+                            <span class="inline-block bg-bonny-50 text-bonny-600 text-xs font-extrabold px-3 py-1 rounded-full mb-1">
+                                ขั้นตอนที่ 8 & 9 • โอนชำระค่ามัดจำและแนบสลิป
+                            </span>
+                            <h2 class="text-lg font-extrabold text-slate-800">${ck.event.title}</h2>
+                            <p class="text-xs text-slate-500 mt-1">จำนวน ${ck.quantity} ใบ • ${ck.selectedPrice} • ${ck.selectedDate}</p>
+                        </div>
+
+                        <!-- Amount & Bank Details Box -->
+                        <div class="bg-gradient-to-br from-sky-50 to-bonny-100/70 border-2 border-bonny-200 rounded-3xl p-5 space-y-3">
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs font-bold text-slate-600">ยอดเงินมัดจำที่ต้องชำระ:</span>
+                                <span class="text-2xl font-extrabold text-bonny-700">${ck.totalDeposit.toLocaleString()} บาท</span>
+                            </div>
+                            <div class="bg-white rounded-2xl p-4 border border-bonny-100 space-y-2 text-xs">
+                                <div class="flex justify-between">
+                                    <span class="text-slate-400">ธนาคาร:</span>
+                                    <span class="font-extrabold text-slate-800">${db.settings.bankName}</span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-slate-400">เลขที่บัญชี:</span>
+                                    <div class="flex items-center gap-2">
+                                        <span class="font-extrabold text-base text-bonny-600 tracking-wide">${db.settings.bankAccountNumber}</span>
+                                        <button type="button" onclick="copyTextToClipboard('${db.settings.bankAccountNumber}', 'เลขบัญชี')"
+                                            class="px-2.5 py-1 rounded-lg bg-bonny-500 text-white text-[11px] font-bold hover:bg-bonny-600">
+                                            คัดลอก
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-slate-400">ชื่อบัญชี:</span>
+                                    <span class="font-extrabold text-slate-800">${db.settings.bankAccountName}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Slip Upload Input -->
+                        <div class="space-y-2">
+                            <label class="block text-xs font-extrabold text-slate-700">แนบสลิปหลักฐานการโอนเงิน (รูปภาพ)</label>
+                            <input type="file" accept="image/*" onchange="handleSlipFileChange(event)"
+                                class="w-full text-xs text-slate-600 file:mr-3 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-extrabold file:bg-bonny-50 file:text-bonny-700 hover:file:bg-bonny-100 border border-slate-200 rounded-2xl p-2 bg-slate-50">
+                            ${ck.slipBase64 ? `
+                                <div class="mt-2 flex flex-col items-center bg-slate-50 p-3 rounded-2xl border border-bonny-200">
+                                    <span class="text-[11px] font-bold text-emerald-600 mb-2">✓ อัปโหลดรูปสลิปเรียบร้อยแล้ว</span>
+                                    <img src="${ck.slipBase64}" alt="Slip Preview" class="max-h-56 rounded-xl shadow-xs">
+                                </div>
+                            ` : ''}
+                        </div>
+
+                        <button type="button" onclick="confirmPaymentAndCreateBooking()"
+                            class="w-full py-3.5 rounded-2xl bg-gradient-to-r from-emerald-400 to-teal-600 hover:from-emerald-500 hover:to-teal-700 text-white font-extrabold text-sm shadow-soft active:scale-98 transition-all">
+                            ยืนยันชำระเงินและส่งหลักฐาน ✅
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function handleSlipFileChange(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                const img = new Image();
+                img.onload = function() {
+                    const canvas = document.createElement('canvas');
+                    const maxDim = 700;
+                    let w = img.width;
+                    let h = img.height;
+                    if (w > maxDim || h > maxDim) {
+                        if (w > h) {
+                            h = Math.round((h * maxDim) / w);
+                            w = maxDim;
+                        } else {
+                            w = Math.round((w * maxDim) / h);
+                            h = maxDim;
+                        }
+                    }
+                    canvas.width = w;
+                    canvas.height = h;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, w, h);
+                    if (state.checkoutData) {
+                        state.checkoutData.slipBase64 = canvas.toDataURL('image/jpeg', 0.72);
+                        renderApp();
+                    }
+                };
+                img.src = evt.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function confirmPaymentAndCreateBooking() {
+            const user = getCurrentUser();
+            const ck = state.checkoutData;
+            if (!user || !ck) return;
+            if (!ck.slipBase64) {
+                showToast('กรุณาแนบสลิปหลักฐานการโอนเงินก่อนกดยืนยัน', 'error');
+                return;
+            }
+
+            const newBooking = {
+                id: 'BK-' + Math.floor(100000 + Math.random() * 900000),
+                userId: user.id,
+                userName: user.fullName,
+                userUsername: user.username,
+                eventId: ck.event.id,
+                eventTitle: ck.event.title,
+                eventImage: ck.event.image,
+                quantity: ck.quantity,
+                selectedPrice: ck.selectedPrice,
+                selectedDate: ck.selectedDate,
+                totalDeposit: ck.totalDeposit,
+                slipImage: ck.slipBase64,
+                status: 'รอตรวจสอบสลิป',
+                createdAt: new Date().toLocaleString('th-TH'),
+                pointsAwarded: false
+            };
+
+            db.bookings.unshift(newBooking);
+            saveDB();
+            state.checkoutData = null;
+            state.activeTab = 'bookings';
+            showToast('ส่งหลักฐานการจองคิวเรียบร้อย! รอแอดมินตรวจสอบสลิปสักครู่ครับ');
+            renderApp();
+        }
+
+        /**
+         * ============================================================================
+         * TAB 2: รายการจอง (BOOKING HISTORY & STATUS)
+         * ============================================================================
+         */
+        function renderMyBookingsTab(user) {
+            const myBookings = db.bookings.filter(b => b.userId === user.id);
+            const filters = ['all', 'รอตรวจสอบสลิป', 'ยืนยันคิวแล้ว', 'กดบัตรสำเร็จ', 'ยกเลิก/คืนเงิน'];
+            const filtered = state.bookingFilter === 'all'
+                ? myBookings
+                : myBookings.filter(b => b.status === state.bookingFilter);
+
+            return `
+                <div class="space-y-4">
+                    <div class="flex items-center justify-between">
+                        <h2 class="text-base font-extrabold text-slate-800 flex items-center gap-2">
+                            <span>📋</span> ประวัติรายการจองคิวของฉัน
+                        </h2>
+                        <span class="text-xs font-bold text-indigo-600 bg-white px-3 py-1 rounded-full border border-indigo-100">
+                            ทั้งหมด ${myBookings.length} รายการ
+                        </span>
+                    </div>
+
+                    <!-- Filter Pills -->
+                    <div class="flex gap-1.5 overflow-x-auto pb-1">
+                        ${filters.map(f => `
+                            <button onclick="setBookingFilter('${f}')"
+                                class="px-3.5 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-all ${state.bookingFilter === f ? 'bg-indigo-500 text-white shadow-xs' : 'bg-white text-slate-600 border border-slate-200 hover:bg-indigo-50'}">
+                                ${f === 'all' ? 'ทั้งหมด' : f}
+                            </button>
+                        `).join('')}
+                    </div>
+
+                    ${filtered.length === 0 ? `
+                        <div class="bg-white rounded-3xl p-10 text-center border-2 border-white shadow-card">
+                            <div class="text-4xl mb-2">📋</div>
+                            <p class="text-sm font-bold text-slate-600">ยังไม่มีรายการจองในหมวดหมู่นี้</p>
+                            <button onclick="switchCustomerTab('home')" class="mt-3 px-4 py-2 rounded-xl bg-bonny-500 text-white text-xs font-extrabold">
+                                ไปหน้าจองคิวเลย ☁️
+                            </button>
+                        </div>
+                    ` : `
+                        <div class="space-y-3">
+                            ${filtered.map(b => `
+                                <div class="bg-white rounded-3xl p-4 border-2 border-white shadow-card flex flex-col sm:flex-row gap-4">
+                                    <img src="${b.eventImage}" alt="${b.eventTitle}" onerror="this.src='https://placehold.co/300x200/38bdf8/ffffff?text=EVENT'"
+                                        class="w-full sm:w-32 h-28 rounded-2xl object-cover shrink-0">
+                                    <div class="flex-1 flex flex-col justify-between space-y-2">
+                                        <div>
+                                            <div class="flex flex-wrap items-center justify-between gap-2 mb-1">
+                                                <span class="text-[11px] font-bold text-slate-400">รหัสจอง: #${b.id}</span>
+                                                ${renderBookingStatusBadge(b.status)}
+                                            </div>
+                                            <h3 class="font-extrabold text-slate-800 text-sm sm:text-base">${b.eventTitle}</h3>
+                                            <p class="text-xs text-slate-500 mt-1">จำนวน: <strong class="text-slate-700">${b.quantity} ใบ</strong> • ${b.selectedPrice}</p>
+                                            <p class="text-xs text-slate-500">รอบแสดง: ${b.selectedDate}</p>
+                                        </div>
+                                        <div class="pt-2 border-t border-slate-100 flex items-center justify-between">
+                                            <span class="text-xs font-extrabold text-bonny-600">มัดจำ: ${Number(b.totalDeposit).toLocaleString()} บาท</span>
+                                            <button onclick="viewSlipModal('${b.id}')" class="text-xs font-bold text-indigo-600 hover:underline">
+                                                ดูหลักฐานสลิป ↗
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    `}
+                </div>
+            `;
+        }
+
+        function setBookingFilter(filter) {
+            state.bookingFilter = filter;
+            renderApp();
+        }
+
+        function renderBookingStatusBadge(status) {
+            const map = {
+                'รอตรวจสอบสลิป': 'bg-amber-100 text-amber-800 border-amber-200',
+                'ยืนยันคิวแล้ว': 'bg-sky-100 text-sky-800 border-sky-200',
+                'กดบัตรสำเร็จ': 'bg-emerald-100 text-emerald-800 border-emerald-200',
+                'ยกเลิก/คืนเงิน': 'bg-rose-100 text-rose-800 border-rose-200'
+            };
+            const cls = map[status] || 'bg-slate-100 text-slate-700 border-slate-200';
+            return `<span class="text-[11px] font-extrabold px-2.5 py-0.5 rounded-full border ${cls}">${status}</span>`;
+        }
+
+        function viewSlipModal(bookingId) {
+            const b = db.bookings.find(item => item.id === bookingId);
+            if (!b) return;
+            openModal(`
+                <div class="bg-white rounded-3xl max-w-md w-full p-5 shadow-2xl space-y-4">
+                    <div class="flex items-center justify-between">
+                        <h3 class="font-extrabold text-slate-800 text-sm">สลิปการโอนเงิน #${b.id}</h3>
+                        <button onclick="closeModal()" class="w-8 h-8 rounded-full bg-slate-100 text-slate-600 font-bold">✕</button>
+                    </div>
+                    <img src="${b.slipImage}" alt="Slip" class="w-full max-h-96 object-contain rounded-2xl bg-slate-50 border">
+                    <div class="text-xs text-slate-600 bg-sky-50 p-3 rounded-2xl">
+                        <p><strong>งาน:</strong> ${b.eventTitle}</p>
+                        <p><strong>ยอดโอน:</strong> ${Number(b.totalDeposit).toLocaleString()} บาท (${b.quantity} ใบ)</p>
+                        <p><strong>เวลาส่งสลิป:</strong> ${b.createdAt}</p>
+                    </div>
+                </div>
+            `);
+        }
+
+        /**
+         * ============================================================================
+         * TAB 3: บัตรของฉัน (ISSUED TICKETS & E-TICKET MODAL)
+         * ============================================================================
+         */
+        function renderMyTicketsTab(user) {
+            const tickets = db.myTickets.filter(t => t.userId === user.id);
+            return `
+                <div class="space-y-4">
+                    <div class="flex items-center justify-between">
+                        <h2 class="text-base font-extrabold text-slate-800 flex items-center gap-2">
+                            <span>🎫</span> บัตรของฉัน (บัตรที่กดสำเร็จแล้ว)
+                        </h2>
+                        <span class="text-xs font-bold text-teal-600 bg-white px-3 py-1 rounded-full border border-teal-100">
+                            ${tickets.length} รายการ
+                        </span>
+                    </div>
+
+                    ${tickets.length === 0 ? `
+                        <div class="bg-white rounded-3xl p-10 text-center border-2 border-white shadow-card">
+                            <div class="text-4xl mb-2">🎫</div>
+                            <p class="text-sm font-bold text-slate-600">ยังไม่มีรายการบัตรในหน้านี้</p>
+                            <p class="text-xs text-slate-400 mt-1">เมื่อแอดมินกดบัตรสำเร็จและเพิ่มรายละเอียดบัตรให้แล้ว บัตรจะแสดงที่นี่ทันที</p>
+                        </div>
+                    ` : `
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            ${tickets.map(t => `
+                                <div class="bg-white rounded-3xl overflow-hidden border-2 border-white shadow-card flex flex-col justify-between">
+                                    <div>
+                                        <div class="relative h-40 bg-teal-50">
+                                            <img src="${t.eventImage}" alt="${t.eventTitle}" onerror="this.src='https://placehold.co/600x350/14b8a6/ffffff?text=MY+TICKET'"
+                                                class="w-full h-full object-cover">
+                                            <span class="absolute top-3 right-3 bg-emerald-500 text-white text-[11px] font-extrabold px-3 py-1 rounded-full shadow-xs">
+                                                จำนวน ${t.quantity} ใบ
+                                            </span>
+                                        </div>
+                                        <div class="p-4">
+                                            <h3 class="font-extrabold text-slate-800 text-base line-clamp-2">${t.eventTitle}</h3>
+                                            <p class="text-xs text-teal-600 font-bold mt-1">โซน/ที่นั่ง: ${t.seatDetails}</p>
+                                        </div>
+                                    </div>
+                                    <div class="px-4 pb-4">
+                                        <button onclick="openTicketDetailModal('${t.id}')"
+                                            class="w-full py-3 rounded-2xl bg-gradient-to-r from-teal-400 to-emerald-600 hover:from-teal-500 hover:to-emerald-700 text-white font-extrabold text-xs shadow-soft">
+                                            🎫 ดูบัตรของฉัน
+                                        </button>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    `}
+                </div>
+            `;
+        }
+
+        function openTicketDetailModal(ticketId) {
+            const t = db.myTickets.find(item => item.id === ticketId);
+            if (!t) return;
+            openModal(`
+                <div class="bg-white rounded-3xl max-w-md w-full overflow-hidden shadow-2xl border-2 border-white">
+                    <div class="bg-gradient-to-r from-sky-500 to-teal-500 p-4 text-white flex items-center justify-between">
+                        <span class="text-xs font-extrabold tracking-wider uppercase">E-TICKET • ${db.settings.siteName}</span>
+                        <button onclick="closeModal()" class="w-7 h-7 rounded-full bg-white/20 text-white font-bold">✕</button>
+                    </div>
+                    <img src="${t.eventImage}" alt="${t.eventTitle}" onerror="this.src='https://placehold.co/600x350/14b8a6/ffffff?text=E-TICKET'" class="w-full h-44 object-cover">
+                    <div class="p-5 space-y-3 ticket-cutout">
+                        <h3 class="text-lg font-extrabold text-slate-800">${t.eventTitle}</h3>
+                        <div class="bg-sky-50 border border-bonny-200 rounded-2xl p-3.5 space-y-1.5 text-xs">
+                            <p><strong class="text-slate-500">รหัสบัตร:</strong> <span class="font-extrabold text-bonny-700">${t.id}</span></p>
+                            <p><strong class="text-slate-500">ชื่อผู้ถือบัตร:</strong> <span class="font-bold text-slate-800">${t.userName}</span></p>
+                            <p><strong class="text-slate-500">จำนวน:</strong> <span class="font-extrabold text-emerald-600">${t.quantity} ใบ</span></p>
+                            <p><strong class="text-slate-500">รายละเอียดโซน/ที่นั่ง:</strong> <span class="font-extrabold text-slate-800">${t.seatDetails}</span></p>
+                            ${t.notes ? `<p><strong class="text-slate-500">หมายเหตุเพิ่มเติม:</strong> <span class="text-slate-700">${t.notes}</span></p>` : ''}
+                        </div>
+                        <button onclick="closeModal()" class="w-full py-3 rounded-2xl bg-slate-900 text-white font-extrabold text-xs">
+                            ปิดหน้าต่าง
+                        </button>
+                    </div>
+                </div>
+            `);
+        }
+
+        /**
+         * ============================================================================
+         * TAB 4: บัตรสมาชิก (VIP CLOUD CARD & REWARD REDEMPTION)
+         * ============================================================================
+         */
+        function renderMemberCardTab(user) {
+            return `
+                <div class="space-y-5">
+                    <!-- Sky Cloud VIP Member Card -->
+                    <div class="rounded-3xl p-6 text-white shadow-cloud relative overflow-hidden border-2 border-white bg-gradient-to-br from-sky-400 via-bonny-500 to-indigo-600">
+                        <div class="relative z-10 flex flex-col justify-between min-h-[180px]">
+                            <div class="flex items-start justify-between">
+                                <div>
+                                    <span class="text-[11px] font-extrabold uppercase tracking-widest bg-white/25 px-3 py-1 rounded-full">
+                                        ☁️ SKY CLOUD VIP PASS
+                                    </span>
+                                    <h2 class="text-xl font-extrabold mt-2">${user.fullName}</h2>
+                                    <p class="text-xs text-sky-100">เบอร์โทร: ${user.phone}</p>
+                                </div>
+                                <div class="text-right">
+                                    <span class="text-[11px] text-sky-100 block">คะแนนสะสม</span>
+                                    <span class="text-3xl font-extrabold text-amber-300 drop-shadow-xs">${user.points.toLocaleString()}</span>
+                                    <span class="text-[11px] text-sky-100 block">แต้ม</span>
+                                </div>
+                            </div>
+
+                            <div class="pt-4 border-t border-white/25 flex items-center justify-between text-xs">
+                                <div>
+                                    <span class="text-sky-100 text-[10px] block">MEMBER ID</span>
+                                    <span class="font-extrabold tracking-wider">${user.memberId}</span>
+                                </div>
+                                <span class="bg-white/20 px-3 py-1 rounded-full font-bold text-[11px]">
+                                    กดสำเร็จรับ +${db.settings.pointsPerTicket} แต้ม/ใบ
+                                </span>
+                            </div>
+                        </div>
+                        <svg class="absolute -right-8 -bottom-6 w-48 h-28 text-white/20 pointer-events-none" viewBox="0 0 200 100" fill="currentColor">
+                            <path d="M35 85h130a25 25 0 0 0 4-49.7A38 38 0 0 0 96 22a32 32 0 0 0-58 17A24 24 0 0 0 35 85z"/>
+                        </svg>
+                    </div>
+
+                    <!-- Rewards Section -->
+                    <div>
+                        <h3 class="text-base font-extrabold text-slate-800 mb-3 flex items-center gap-2">
+                            <span>🎁</span> แลกของรางวัลด้วยคะแนนสะสม
+                        </h3>
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                            ${db.rewards.map(r => {
+                                const canRedeem = user.points >= r.pointsRequired && r.stock > 0;
+                                return `
+                                    <div class="bg-white rounded-3xl overflow-hidden border-2 border-white shadow-card flex flex-col justify-between">
+                                        <div>
+                                            <img src="${r.image}" alt="${r.title}" onerror="this.src='https://placehold.co/400x300/38bdf8/ffffff?text=REWARD'"
+                                                class="w-full h-36 object-cover bg-sky-50">
+                                            <div class="p-4">
+                                                <h4 class="font-extrabold text-slate-800 text-sm line-clamp-2">${r.title}</h4>
+                                                <div class="mt-2 flex items-center justify-between text-xs">
+                                                    <span class="font-extrabold text-amber-600">⭐ ${r.pointsRequired} แต้ม</span>
+                                                    <span class="text-slate-400">เหลือ ${r.stock} สิทธิ์</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="px-4 pb-4">
+                                            <button type="button" onclick="redeemReward('${r.id}')" ${!canRedeem ? 'disabled' : ''}
+                                                class="w-full py-2.5 rounded-2xl text-xs font-extrabold transition-all ${canRedeem ? 'bg-amber-500 hover:bg-amber-600 text-white shadow-soft' : 'bg-slate-100 text-slate-400 cursor-not-allowed'}">
+                                                ${r.stock <= 0 ? 'ของรางวัลหมด' : canRedeem ? 'แลกของรางวัลทันที 🎁' : `ขาดอีก ${r.pointsRequired - user.points} แต้ม`}
+                                            </button>
+                                        </div>
+                                    </div>
+                                `;
+                            }).join('')}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function redeemReward(rewardId) {
+            const user = getCurrentUser();
+            const reward = db.rewards.find(r => r.id === rewardId);
+            if (!user || !reward) return;
+            if (user.points < reward.pointsRequired) {
+                showToast('คะแนนสะสมของคุณยังไม่เพียงพอ', 'error');
+                return;
+            }
+            if (reward.stock <= 0) {
+                showToast('ของรางวัลนี้หมดแล้ว', 'error');
+                return;
+            }
+            user.points -= reward.pointsRequired;
+            reward.stock -= 1;
+            db.redemptions.unshift({
+                id: 'RDM-' + Date.now(),
+                userId: user.id,
+                userName: user.fullName,
+                rewardTitle: reward.title,
+                pointsSpent: reward.pointsRequired,
+                redeemedAt: new Date().toLocaleString('th-TH')
+            });
+            saveDB();
+            showToast(`แลก "${reward.title}" สำเร็จแล้ว! แจ้งแอดมินเพื่อรับสิทธิ์ได้เลย 🎁`);
+            renderApp();
+        }
+
+        /**
+         * ============================================================================
+         * TAB 5: ฉัน (PROFILE, ADDRESSES, REFUND BANK & ADMIN ENTRY)
+         * ============================================================================
+         */
+        function renderProfileTab(user) {
+            return `
+                <div class="space-y-4">
+                    <!-- Master Admin Exclusive Entry Banner (ONLY visible to Bonnyticket / 0934909361) -->
+                    ${isMasterAdmin(user) ? `
+                        <div class="bg-slate-900 text-white rounded-3xl p-5 shadow-lg flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-2 border-bonny-400">
+                            <div>
+                                <span class="bg-bonny-500 text-white text-[10px] font-extrabold px-2.5 py-0.5 rounded-full uppercase">MASTER ADMIN ACCESS</span>
+                                <h3 class="font-extrabold text-base mt-1">ระบบจัดการหลังบ้านเต็มรูปแบบ</h3>
+                                <p class="text-xs text-slate-300">อนุมัติสลิป เพิ่มบัตรลูกค้า จัดการงาน ของรางวัล รหัสลูกค้า และแก้ไขหน้าเว็บ</p>
+                            </div>
+                            <button onclick="switchToAdmin()"
+                                class="w-full sm:w-auto px-5 py-3 rounded-2xl bg-gradient-to-r from-sky-400 to-bonny-600 hover:from-sky-500 hover:to-bonny-700 text-white font-extrabold text-xs shadow-soft shrink-0">
+                                🛡️ เข้าสู่หลังบ้าน
+                            </button>
+                        </div>
+                    ` : ''}
+
+                    <!-- Profile Summary Card -->
+                    <div class="bg-white rounded-3xl p-5 border-2 border-white shadow-card space-y-4">
+                        <div class="flex items-center gap-4">
+                            <div class="w-16 h-16 rounded-3xl bg-gradient-to-br from-sky-300 to-bonny-600 text-white flex items-center justify-center text-2xl font-extrabold shadow-soft shrink-0">
+                                ${user.fullName.charAt(0)}
+                            </div>
+                            <div>
+                                <h2 class="text-lg font-extrabold text-slate-800">${user.fullName}</h2>
+                                <p class="text-xs font-bold text-bonny-600">รหัสสมาชิก: ${user.memberId} (ไม่ซ้ำใคร)</p>
+                                <p class="text-xs text-slate-500 mt-0.5">คะแนนสะสม: <strong class="text-amber-600">${user.points.toLocaleString()} แต้ม</strong></p>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 pt-3 border-t border-slate-100 text-xs">
+                            <div class="bg-slate-50 p-3 rounded-2xl">
+                                <span class="text-slate-400 block">ชื่อผู้ใช้งาน</span>
+                                <strong class="text-slate-800">${user.username}</strong>
+                            </div>
+                            <div class="bg-slate-50 p-3 rounded-2xl">
+                                <span class="text-slate-400 block">เบอร์โทรศัพท์</span>
+                                <strong class="text-slate-800">${user.phone}</strong>
+                            </div>
+                            <div class="bg-slate-50 p-3 rounded-2xl">
+                                <span class="text-slate-400 block">LINE ID</span>
+                                <strong class="text-slate-800">${user.lineId}</strong>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Shipping Addresses -->
+                    <div class="bg-white rounded-3xl p-5 border-2 border-white shadow-card space-y-3">
+                        <h3 class="text-sm font-extrabold text-slate-800">🏠 ที่อยู่สำหรับจัดส่งบัตรแข็ง / ของรางวัล</h3>
+                        ${user.addresses.length === 0 ? `
+                            <p class="text-xs text-slate-400">ยังไม่ได้เพิ่มที่อยู่จัดส่ง</p>
+                        ` : `
+                            <div class="space-y-2">
+                                ${user.addresses.map(addr => `
+                                    <div class="bg-sky-50/60 border border-bonny-100 p-3.5 rounded-2xl flex items-start justify-between gap-2 text-xs">
+                                        <div>
+                                            <span class="font-extrabold text-bonny-700">${addr.label}</span>
+                                            <p class="text-slate-600 mt-0.5">${addr.detail}</p>
+                                        </div>
+                                        <button onclick="deleteUserAddress('${addr.id}')" class="text-rose-500 hover:underline font-bold shrink-0">ลบ</button>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        `}
+                        <form onsubmit="addUserAddress(event)" class="pt-2 grid grid-cols-1 sm:grid-cols-3 gap-2">
+                            <input type="text" id="addr-label" required placeholder="ชื่อเรียก เช่น บ้าน / ที่ทำงาน"
+                                class="px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-xs">
+                            <input type="text" id="addr-detail" required placeholder="บ้านเลขที่ ถนน ตำบล อำเภอ จังหวัด รหัสไปรษณีย์"
+                                class="sm:col-span-2 px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-xs">
+                            <button type="submit" class="sm:col-span-3 py-2.5 rounded-xl bg-bonny-500 hover:bg-bonny-600 text-white font-extrabold text-xs">
+                                + เพิ่มที่อยู่จัดส่ง
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Refund Bank Account -->
+                    <div class="bg-white rounded-3xl p-5 border-2 border-white shadow-card space-y-3">
+                        <h3 class="text-sm font-extrabold text-slate-800">💳 บัญชีธนาคารสำหรับรับเงินคืน (กรณีจองคิวไม่สำเร็จ)</h3>
+                        <form onsubmit="saveRefundBank(event)" class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                            <input type="text" id="refund-bank" required value="${user.refundBank?.bankName || ''}" placeholder="ชื่อธนาคาร เช่น กสิกรไทย"
+                                class="px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-xs">
+                            <input type="text" id="refund-acc" required value="${user.refundBank?.accountNumber || ''}" placeholder="เลขที่บัญชี"
+                                class="px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-xs">
+                            <input type="text" id="refund-name" required value="${user.refundBank?.accountName || ''}" placeholder="ชื่อบัญชี"
+                                class="px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-xs">
+                            <button type="submit" class="sm:col-span-3 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-extrabold text-xs">
+                                บันทึกบัญชีรับเงินคืน
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Logout Button -->
+                    <button onclick="handleLogout()"
+                        class="w-full py-3.5 rounded-2xl bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 font-extrabold text-xs transition-colors">
+                        ออกจากระบบ (Logout)
+                    </button>
+                </div>
+            `;
+        }
+
+        function addUserAddress(e) {
+            e.preventDefault();
+            const user = getCurrentUser();
+            if (!user) return;
+            const label = document.getElementById('addr-label').value.trim();
+            const detail = document.getElementById('addr-detail').value.trim();
+            user.addresses.push({ id: 'ADDR-' + Date.now(), label, detail });
+            saveDB();
+            showToast('เพิ่มที่อยู่จัดส่งเรียบร้อยแล้ว');
+            renderApp();
+        }
+
+        function deleteUserAddress(addrId) {
+            const user = getCurrentUser();
+            if (!user) return;
+            user.addresses = user.addresses.filter(a => a.id !== addrId);
+            saveDB();
+            showToast('ลบที่อยู่เรียบร้อยแล้ว', 'info');
+            renderApp();
+        }
+
+        function saveRefundBank(e) {
+            e.preventDefault();
+            const user = getCurrentUser();
+            if (!user) return;
+            user.refundBank = {
+                bankName: document.getElementById('refund-bank').value.trim(),
+                accountNumber: document.getElementById('refund-acc').value.trim(),
+                accountName: document.getElementById('refund-name').value.trim()
+            };
+            saveDB();
+            showToast('บันทึกข้อมูลบัญชีรับเงินคืนเรียบร้อยแล้ว');
+            renderApp();
+        }
+
+        /**
+         * ============================================================================
+         * MASTER ADMIN BACK-OFFICE (EXCLUSIVE TO Bonnyticket / 0934909361)
+         * ============================================================================
+         */
+        function switchToAdmin() {
+            const user = getCurrentUser();
+            if (!isMasterAdmin(user)) return;
+            state.viewMode = 'admin';
+            state.adminTab = 'overview';
+            renderApp();
+        }
+
+        function switchToCustomer() {
+            state.viewMode = 'customer';
+            state.activeTab = 'home';
+            renderApp();
+        }
+
+        function renderAdminShell(user) {
+            const tabs = [
+                { id: 'overview', label: '📊 สรุปยอด' },
+                { id: 'orders', label: '🧾 อนุมัติสลิป & คิว' },
+                { id: 'issue_ticket', label: '🎫 เพิ่มบัตรลูกค้า' },
+                { id: 'events', label: '🎤 จัดการงานจองคิว' },
+                { id: 'rewards', label: '🎁 จัดการของรางวัล' },
+                { id: 'customers', label: '👥 ลูกค้า & รหัสลูกค้า' },
+                { id: 'settings', label: '⚙️ ตั้งค่าเว็บ & บัญชี' }
+            ];
+
+            return `
+                <div class="min-h-screen bg-slate-100 flex flex-col">
+                    <header class="bg-slate-900 text-white px-4 py-3.5 sticky top-0 z-30 shadow-md">
+                        <div class="max-w-6xl mx-auto flex flex-wrap items-center justify-between gap-2">
+                            <div class="flex items-center gap-2.5">
+                                <span class="bg-bonny-500 text-white text-xs font-extrabold px-2.5 py-1 rounded-lg">ADMIN</span>
+                                <h1 class="font-extrabold text-sm sm:text-base">ระบบจัดการหลังบ้าน ${db.settings.siteName}</h1>
+                            </div>
+                            <button onclick="switchToCustomer()" class="px-3.5 py-1.5 rounded-xl bg-bonny-500 hover:bg-bonny-600 text-white text-xs font-extrabold">
+                                ← กลับหน้าบ้านลูกค้า
+                            </button>
+                        </div>
+                    </header>
+
+                    <!-- Admin Sub-navigation -->
+                    <div class="bg-white border-b border-slate-200 sticky top-14 z-20">
+                        <div class="max-w-6xl mx-auto px-4 py-2 flex gap-1.5 overflow-x-auto">
+                            ${tabs.map(t => `
+                                <button onclick="setAdminTab('${t.id}')"
+                                    class="px-3.5 py-2 rounded-xl text-xs font-extrabold whitespace-nowrap transition-all ${state.adminTab === t.id ? 'bg-slate-900 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}">
+                                    ${t.label}
+                                </button>
+                            `).join('')}
+                        </div>
+                    </div>
+
+                    <main class="flex-1 max-w-6xl w-full mx-auto px-4 py-6">
+                        ${renderAdminTabContent()}
+                    </main>
+                </div>
+            `;
+        }
+
+        function setAdminTab(tabId) {
+            state.adminTab = tabId;
+            renderApp();
+        }
+
+        function renderAdminTabContent() {
+            switch (state.adminTab) {
+                case 'overview': return renderAdminOverview();
+                case 'orders': return renderAdminOrders();
+                case 'issue_ticket': return renderAdminIssueTicket();
+                case 'events': return renderAdminEvents();
+                case 'rewards': return renderAdminRewards();
+                case 'customers': return renderAdminCustomers();
+                case 'settings': return renderAdminSettings();
+                default: return renderAdminOverview();
+            }
+        }
+
+        function renderAdminOverview() {
+            const totalRevenue = db.bookings
+                .filter(b => b.status !== 'ยกเลิก/คืนเงิน')
+                .reduce((sum, b) => sum + Number(b.totalDeposit || 0), 0);
+            const pendingCount = db.bookings.filter(b => b.status === 'รอตรวจสอบสลิป').length;
+            const successCount = db.bookings.filter(b => b.status === 'กดบัตรสำเร็จ').length;
+            const totalTicketsBooked = db.bookings.reduce((sum, b) => sum + Number(b.quantity || 0), 0);
+
+            return `
+                <div class="space-y-6">
+                    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs">
+                            <p class="text-xs text-slate-400 font-bold">ยอดเงินมัดจำรวม</p>
+                            <p class="text-2xl font-extrabold text-bonny-600 mt-1">${totalRevenue.toLocaleString()} ฿</p>
+                        </div>
+                        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs">
+                            <p class="text-xs text-slate-400 font-bold">สลิปรอตรวจสอบ</p>
+                            <p class="text-2xl font-extrabold text-amber-500 mt-1">${pendingCount} รายการ</p>
+                        </div>
+                        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs">
+                            <p class="text-xs text-slate-400 font-bold">กดบัตรสำเร็จแล้ว</p>
+                            <p class="text-2xl font-extrabold text-emerald-600 mt-1">${successCount} ออเดอร์</p>
+                        </div>
+                        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs">
+                            <p class="text-xs text-slate-400 font-bold">สมาชิกทั้งหมด / บัตรที่จอง</p>
+                            <p class="text-2xl font-extrabold text-slate-800 mt-1">${db.users.length} คน / ${totalTicketsBooked} ใบ</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs">
+                        <h3 class="font-extrabold text-slate-800 text-sm mb-3">รายการจองล่าสุด</h3>
+                        ${db.bookings.length === 0 ? `<p class="text-xs text-slate-400">ยังไม่มีรายการจองเข้ามา</p>` : `
+                            <div class="space-y-2">
+                                ${db.bookings.slice(0, 5).map(b => `
+                                    <div class="flex flex-wrap items-center justify-between gap-2 p-3 rounded-xl bg-slate-50 text-xs">
+                                        <div>
+                                            <strong>#${b.id}</strong> • ${b.userName} (${b.eventTitle} x${b.quantity})
+                                        </div>
+                                        <div class="flex items-center gap-2">
+                                            <span class="font-bold text-bonny-600">${Number(b.totalDeposit).toLocaleString()} ฿</span>
+                                            ${renderBookingStatusBadge(b.status)}
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        `}
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderAdminOrders() {
+            return `
+                <div class="space-y-4">
+                    <h2 class="text-base font-extrabold text-slate-800">🧾 จัดการออเดอร์และอนุมัติสลิปทั้งหมด (${db.bookings.length})</h2>
+                    ${db.bookings.length === 0 ? `<div class="bg-white p-8 rounded-2xl text-center text-xs text-slate-400">ยังไม่มีรายการจอง</div>` : `
+                        <div class="space-y-3">
+                            ${db.bookings.map(b => `
+                                <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs flex flex-col md:flex-row justify-between gap-4">
+                                    <div class="space-y-1 text-xs">
+                                        <div class="flex items-center gap-2">
+                                            <span class="font-extrabold text-slate-800">#${b.id}</span>
+                                            ${renderBookingStatusBadge(b.status)}
+                                            <span class="text-slate-400">${b.createdAt}</span>
+                                        </div>
+                                        <p class="font-bold text-bonny-700 text-sm">${b.eventTitle}</p>
+                                        <p>ลูกค้า: <strong>${b.userName}</strong> (@${b.userUsername})</p>
+                                        <p>จำนวน: <strong>${b.quantity} ใบ</strong> • โซน: ${b.selectedPrice} • รอบ: ${b.selectedDate}</p>
+                                        <p>ยอดมัดจำ: <strong class="text-emerald-600">${Number(b.totalDeposit).toLocaleString()} บาท</strong></p>
+                                        <button onclick="viewSlipModal('${b.id}')" class="mt-1 inline-block px-3 py-1 rounded-lg bg-sky-50 text-bonny-700 font-bold border border-bonny-200">
+                                            🔍 เปิดดูรูปสลิป
+                                        </button>
+                                    </div>
+                                    <div class="flex flex-col justify-center gap-2 min-w-[200px]">
+                                        <label class="text-[11px] font-bold text-slate-500">อัปเดตสถานะรายการ:</label>
+                                        <select onchange="adminUpdateBookingStatus('${b.id}', this.value)"
+                                            class="px-3 py-2 rounded-xl border border-slate-300 text-xs font-bold bg-slate-50">
+                                            <option value="รอตรวจสอบสลิป" ${b.status === 'รอตรวจสอบสลิป' ? 'selected' : ''}>รอตรวจสอบสลิป</option>
+                                            <option value="ยืนยันคิวแล้ว" ${b.status === 'ยืนยันคิวแล้ว' ? 'selected' : ''}>ยืนยันคิวแล้ว (อนุมัติสลิป)</option>
+                                            <option value="กดบัตรสำเร็จ" ${b.status === 'กดบัตรสำเร็จ' ? 'selected' : ''}>กดบัตรสำเร็จ (+ให้แต้มอัตโนมัติ)</option>
+                                            <option value="ยกเลิก/คืนเงิน" ${b.status === 'ยกเลิก/คืนเงิน' ? 'selected' : ''}>ยกเลิก/คืนเงิน</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    `}
+                </div>
+            `;
+        }
+
+        function adminUpdateBookingStatus(bookingId, newStatus) {
+            const booking = db.bookings.find(b => b.id === bookingId);
+            if (!booking) return;
+            const prevStatus = booking.status;
+            booking.status = newStatus;
+
+            if (newStatus === 'กดบัตรสำเร็จ' && prevStatus !== 'กดบัตรสำเร็จ' && !booking.pointsAwarded) {
+                const user = db.users.find(u => u.id === booking.userId);
+                if (user) {
+                    const earned = Number(booking.quantity) * Number(db.settings.pointsPerTicket || 50);
+                    user.points += earned;
+                    booking.pointsAwarded = true;
+                    showToast(`อัปเดตเป็นกดบัตรสำเร็จ และเพิ่ม ${earned} แต้มให้คุณ ${user.fullName} แล้ว!`);
+                }
+            } else {
+                showToast(`เปลี่ยนสถานะ #${booking.id} เป็น "${newStatus}" เรียบร้อย`);
+            }
+            saveDB();
+            renderApp();
+        }
+
+        function renderAdminIssueTicket() {
+            const query = state.adminCustomerSearch.toLowerCase().trim();
+            const matchedUsers = db.users.filter(u =>
+                !query ||
+                u.username.toLowerCase().includes(query) ||
+                u.fullName.toLowerCase().includes(query) ||
+                u.memberId.toLowerCase().includes(query)
+            );
+
+            return `
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs space-y-4">
+                        <h2 class="font-extrabold text-slate-800 text-base">🎫 ค้นหาลูกค้า & เพิ่มบัตรเข้าหน้า "บัตรของฉัน"</h2>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-600 mb-1">ค้นหาชื่อ / Username / Member ID ลูกค้า:</label>
+                            <input type="text" value="${state.adminCustomerSearch}" oninput="updateAdminCustomerSearch(this.value)"
+                                placeholder="พิมพ์ชื่อ หรือ BNY-..." class="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-xs">
+                        </div>
+                        <form onsubmit="adminIssueTicketSubmit(event)" class="space-y-3 text-xs">
+                            <div>
+                                <label class="block font-bold text-slate-700 mb-1">1. เลือกลูกค้า (${matchedUsers.length} คน)</label>
+                                <select id="issue-userid" required class="w-full px-3 py-2.5 rounded-xl border border-slate-300 bg-slate-50 font-bold">
+                                    ${matchedUsers.map(u => `<option value="${u.id}">${u.fullName} (@${u.username} • ${u.memberId})</option>`).join('')}
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block font-bold text-slate-700 mb-1">2. เลือกงาน</label>
+                                <select id="issue-eventid" class="w-full px-3 py-2.5 rounded-xl border border-slate-300 bg-slate-50">
+                                    ${db.events.map(ev => `<option value="${ev.id}">${ev.title}</option>`).join('')}
+                                </select>
+                            </div>
+                            <div class="grid grid-cols-2 gap-2">
+                                <div>
+                                    <label class="block font-bold text-slate-700 mb-1">3. จำนวนบัตร (ใบ)</label>
+                                    <input type="number" id="issue-qty" min="1" value="1" required class="w-full px-3 py-2 rounded-xl border border-slate-300">
+                                </div>
+                                <div>
+                                    <label class="block font-bold text-slate-700 mb-1">4. โซน / แถว / เลขที่นั่ง</label>
+                                    <input type="text" id="issue-seat" required placeholder="เช่น VIP A1 แถว B ที่นั่ง 12" class="w-full px-3 py-2 rounded-xl border border-slate-300">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block font-bold text-slate-700 mb-1">5. รายละเอียดเพิ่มเติม / ลิงก์รับบัตร</label>
+                                <textarea id="issue-notes" rows="2" placeholder="ระบุรายละเอียดเพิ่มเติมให้ลูกค้าเห็นเมื่อกดดูบัตร" class="w-full px-3 py-2 rounded-xl border border-slate-300"></textarea>
+                            </div>
+                            <button type="submit" class="w-full py-3 rounded-xl bg-teal-600 hover:bg-teal-700 text-white font-extrabold">
+                                + เพิ่มบัตรให้ลูกค้าทันที
+                            </button>
+                        </form>
+                    </div>
+
+                    <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs space-y-3">
+                        <h3 class="font-extrabold text-slate-800 text-sm">รายการบัตรที่ออกให้ลูกค้าแล้ว (${db.myTickets.length})</h3>
+                        ${db.myTickets.length === 0 ? `<p class="text-xs text-slate-400">ยังไม่มีรายการบัตรที่เพิ่ม</p>` : `
+                            <div class="space-y-2 max-h-96 overflow-y-auto">
+                                ${db.myTickets.map(t => `
+                                    <div class="p-3 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between gap-2 text-xs">
+                                        <div>
+                                            <p class="font-extrabold text-slate-800">${t.eventTitle} (${t.quantity} ใบ)</p>
+                                            <p class="text-slate-500">ลูกค้า: ${t.userName} • ที่นั่ง: ${t.seatDetails}</p>
+                                        </div>
+                                        <button onclick="adminDeleteIssuedTicket('${t.id}')" class="text-rose-500 font-bold hover:underline">ลบ</button>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        `}
+                    </div>
+                </div>
+            `;
+        }
+
+        function updateAdminCustomerSearch(val) {
+            state.adminCustomerSearch = val;
+            renderApp();
+        }
+
+        function adminIssueTicketSubmit(e) {
+            e.preventDefault();
+            const userId = document.getElementById('issue-userid').value;
+            const eventId = document.getElementById('issue-eventid').value;
+            const quantity = Number(document.getElementById('issue-qty').value);
+            const seatDetails = document.getElementById('issue-seat').value.trim();
+            const notes = document.getElementById('issue-notes').value.trim();
+
+            const user = db.users.find(u => u.id === userId);
+            const ev = db.events.find(item => item.id === eventId);
+            if (!user || !ev) return;
+
+            db.myTickets.unshift({
+                id: 'TCK-' + Math.floor(100000 + Math.random() * 900000),
+                userId: user.id,
+                userName: user.fullName,
+                eventTitle: ev.title,
+                eventImage: ev.image,
+                quantity,
+                seatDetails,
+                notes,
+                issuedAt: new Date().toLocaleDateString('th-TH')
+            });
+            saveDB();
+            showToast(`เพิ่มบัตร "${ev.title}" ให้คุณ ${user.fullName} เรียบร้อย!`);
+            renderApp();
+        }
+
+        function adminDeleteIssuedTicket(id) {
+            db.myTickets = db.myTickets.filter(t => t.id !== id);
+            saveDB();
+            showToast('ลบบัตรออกเรียบร้อย', 'info');
+            renderApp();
+        }
+
+        function renderAdminEvents() {
+            return `
+                <div class="space-y-6">
+                    <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs space-y-4">
+                        <h2 class="font-extrabold text-slate-800 text-base">🎤 เพิ่มงานรับจองคิวใหม่</h2>
+                        <form onsubmit="adminAddEvent(event)" class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+                            <div>
+                                <label class="block font-bold mb-1">ชื่องาน / คอนเสิร์ต</label>
+                                <input type="text" id="ev-title" required placeholder="เช่น SUMMER CONCERT 2026" class="w-full px-3 py-2 rounded-xl border border-slate-300">
+                            </div>
+                            <div>
+                                <label class="block font-bold mb-1">URL รูปภาพหน้าปกงาน</label>
+                                <input type="url" id="ev-image" placeholder="https://..." class="w-full px-3 py-2 rounded-xl border border-slate-300">
+                            </div>
+                            <div>
+                                <label class="block font-bold mb-1">ราคามัดจำต่อใบ (บาท)</label>
+                                <input type="number" id="ev-deposit" value="200" required class="w-full px-3 py-2 rounded-xl border border-slate-300">
+                            </div>
+                            <div>
+                                <label class="block font-bold mb-1">ราคาบัตร/โซน (คั่นด้วยเครื่องหมายจุลภาค , )</label>
+                                <input type="text" id="ev-prices" required placeholder="5,500 VIP, 4,500 Zone A, 3,000 Zone B" class="w-full px-3 py-2 rounded-xl border border-slate-300">
+                            </div>
+                            <div class="md:col-span-2">
+                                <label class="block font-bold mb-1">วันที่/รอบแสดง (คั่นด้วยเครื่องหมายจุลภาค , )</label>
+                                <input type="text" id="ev-dates" required placeholder="เสาร์ที่ 25 ธ.ค. 2569, อาทิตย์ที่ 26 ธ.ค. 2569" class="w-full px-3 py-2 rounded-xl border border-slate-300">
+                            </div>
+                            <div class="md:col-span-2">
+                                <label class="block font-bold mb-1">กฎกติกาและรายละเอียด</label>
+                                <textarea id="ev-rules" rows="2" required class="w-full px-3 py-2 rounded-xl border border-slate-300">1. มัดจำใบละ 200 บาท&#10;2. กดบัตรไม่ได้คืนเงินเต็มจำนวน 100%</textarea>
+                            </div>
+                            <button type="submit" class="md:col-span-2 py-3 rounded-xl bg-bonny-600 hover:bg-bonny-700 text-white font-extrabold">
+                                + บันทึกและเปิดรับจองคิวงานนี้
+                            </button>
+                        </form>
+                    </div>
+
+                    <div class="space-y-3">
+                        <h3 class="font-extrabold text-slate-800 text-sm">รายการงานทั้งหมดในระบบ (${db.events.length})</h3>
+                        ${db.events.map(ev => `
+                            <div class="bg-white p-4 rounded-2xl border border-slate-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs">
+                                <div class="flex items-center gap-3">
+                                    <img src="${ev.image}" onerror="this.src='https://placehold.co/200x120/38bdf8/ffffff?text=EVENT'" class="w-20 h-14 rounded-xl object-cover">
+                                    <div>
+                                        <p class="font-extrabold text-slate-800 text-sm">${ev.title}</p>
+                                        <p class="text-slate-500">มัดจำ ${ev.depositPerTicket} ฿/ใบ • ${ev.dates.join(', ')}</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <button onclick="openEditEventModal('${ev.id}')" class="px-3 py-1.5 rounded-lg bg-sky-50 text-bonny-700 font-bold border border-bonny-200">แก้ไข</button>
+                                    <button onclick="adminToggleEvent('${ev.id}')" class="px-3 py-1.5 rounded-lg font-bold ${ev.active ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-200 text-slate-600'}">
+                                        ${ev.active ? 'เปิดรับคิวอยู่' : 'ปิดรับชั่วคราว'}
+                                    </button>
+                                    <button onclick="adminDeleteEvent('${ev.id}')" class="px-3 py-1.5 rounded-lg bg-rose-50 text-rose-600 font-bold">ลบ</button>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        function openEditEventModal(eventId) {
+            const ev = db.events.find(item => item.id === eventId);
+            if (!ev) return;
+            openModal(`
+                <div class="bg-white rounded-3xl max-w-lg w-full p-5 shadow-2xl space-y-4">
+                    <div class="flex items-center justify-between">
+                        <h3 class="font-extrabold text-slate-800 text-sm">แก้ไขรายละเอียดงานจองคิว</h3>
+                        <button onclick="closeModal()" class="w-8 h-8 rounded-full bg-slate-100 text-slate-600 font-bold">✕</button>
+                    </div>
+                    <form onsubmit="saveEditedEvent(event, '${ev.id}')" class="space-y-3 text-xs">
+                        <div>
+                            <label class="block font-bold mb-1">ชื่องาน</label>
+                            <input type="text" id="edit-ev-title" value="${ev.title}" required class="w-full px-3 py-2 rounded-xl border border-slate-300">
+                        </div>
+                        <div>
+                            <label class="block font-bold mb-1">URL รูปภาพ</label>
+                            <input type="url" id="edit-ev-image" value="${ev.image}" required class="w-full px-3 py-2 rounded-xl border border-slate-300">
+                        </div>
+                        <div>
+                            <label class="block font-bold mb-1">ราคามัดจำต่อใบ (บาท)</label>
+                            <input type="number" id="edit-ev-deposit" value="${ev.depositPerTicket}" required class="w-full px-3 py-2 rounded-xl border border-slate-300">
+                        </div>
+                        <div>
+                            <label class="block font-bold mb-1">ราคาบัตร/โซน (คั่นด้วย , )</label>
+                            <input type="text" id="edit-ev-prices" value="${ev.prices.join(', ')}" required class="w-full px-3 py-2 rounded-xl border border-slate-300">
+                        </div>
+                        <div>
+                            <label class="block font-bold mb-1">วันที่แสดง (คั่นด้วย , )</label>
+                            <input type="text" id="edit-ev-dates" value="${ev.dates.join(', ')}" required class="w-full px-3 py-2 rounded-xl border border-slate-300">
+                        </div>
+                        <div>
+                            <label class="block font-bold mb-1">กฎกติกา</label>
+                            <textarea id="edit-ev-rules" rows="3" required class="w-full px-3 py-2 rounded-xl border border-slate-300">${ev.rules}</textarea>
+                        </div>
+                        <button type="submit" class="w-full py-3 rounded-xl bg-bonny-600 text-white font-extrabold">บันทึกการแก้ไข</button>
+                    </form>
+                </div>
+            `);
+        }
+
+        function saveEditedEvent(e, eventId) {
+            e.preventDefault();
+            const ev = db.events.find(item => item.id === eventId);
+            if (!ev) return;
+            ev.title = document.getElementById('edit-ev-title').value.trim();
+            ev.image = document.getElementById('edit-ev-image').value.trim();
+            ev.depositPerTicket = Number(document.getElementById('edit-ev-deposit').value);
+            ev.prices = document.getElementById('edit-ev-prices').value.split(',').map(s => s.trim()).filter(Boolean);
+            ev.dates = document.getElementById('edit-ev-dates').value.split(',').map(s => s.trim()).filter(Boolean);
+            ev.rules = document.getElementById('edit-ev-rules').value.trim();
+            saveDB();
+            closeModal();
+            showToast('บันทึกการแก้ไขงานเรียบร้อย');
+            renderApp();
+        }
+
+        function adminAddEvent(e) {
+            e.preventDefault();
+            const title = document.getElementById('ev-title').value.trim();
+            const image = document.getElementById('ev-image').value.trim() || 'https://placehold.co/800x450/38bdf8/ffffff?text=' + encodeURIComponent(title);
+            const depositPerTicket = Number(document.getElementById('ev-deposit').value);
+            const prices = document.getElementById('ev-prices').value.split(',').map(s => s.trim()).filter(Boolean);
+            const dates = document.getElementById('ev-dates').value.split(',').map(s => s.trim()).filter(Boolean);
+            const rules = document.getElementById('ev-rules').value.trim();
+
+            db.events.unshift({
+                id: 'EVT-' + Date.now(),
+                title,
+                image,
+                depositPerTicket,
+                prices,
+                dates,
+                rules,
+                active: true
+            });
+            saveDB();
+            showToast('เพิ่มงานจองคิวเรียบร้อยแล้ว');
+            renderApp();
+        }
+
+        function adminToggleEvent(id) {
+            const ev = db.events.find(item => item.id === id);
+            if (!ev) return;
+            ev.active = !ev.active;
+            saveDB();
+            renderApp();
+        }
+
+        function adminDeleteEvent(id) {
+            db.events = db.events.filter(item => item.id !== id);
+            saveDB();
+            showToast('ลบงานเรียบร้อยแล้ว', 'info');
+            renderApp();
+        }
+
+        function renderAdminRewards() {
+            return `
+                <div class="space-y-6">
+                    <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs space-y-4">
+                        <h2 class="font-extrabold text-slate-800 text-base">🎁 เพิ่มของรางวัลสำหรับแลกคะแนน</h2>
+                        <form onsubmit="adminAddReward(event)" class="grid grid-cols-1 sm:grid-cols-4 gap-3 text-xs">
+                            <input type="text" id="rwd-title" required placeholder="ชื่อของรางวัล" class="px-3 py-2 rounded-xl border border-slate-300">
+                            <input type="url" id="rwd-image" placeholder="URL รูปของรางวัล" class="px-3 py-2 rounded-xl border border-slate-300">
+                            <input type="number" id="rwd-points" required min="1" placeholder="คะแนนที่ใช้แลก" class="px-3 py-2 rounded-xl border border-slate-300">
+                            <input type="number" id="rwd-stock" required min="1" value="10" placeholder="จำนวนคงเหลือ" class="px-3 py-2 rounded-xl border border-slate-300">
+                            <button type="submit" class="sm:col-span-4 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-extrabold">
+                                + เพิ่มของรางวัล
+                            </button>
+                        </form>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                        ${db.rewards.map(r => `
+                            <div class="bg-white p-4 rounded-2xl border border-slate-200 flex flex-col justify-between gap-2 text-xs">
+                                <div>
+                                    <img src="${r.image}" onerror="this.src='https://placehold.co/400x300/38bdf8/ffffff?text=REWARD'" class="w-full h-32 object-cover rounded-xl mb-2">
+                                    <p class="font-extrabold text-slate-800 text-sm">${r.title}</p>
+                                    <p class="text-amber-600 font-bold">ใช้ ${r.pointsRequired} แต้ม • คงเหลือ ${r.stock}</p>
+                                </div>
+                                <button onclick="adminDeleteReward('${r.id}')" class="py-1.5 rounded-lg bg-rose-50 text-rose-600 font-bold">ลบของรางวัล</button>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        function adminAddReward(e) {
+            e.preventDefault();
+            const title = document.getElementById('rwd-title').value.trim();
+            const image = document.getElementById('rwd-image').value.trim() || 'https://placehold.co/400x300/38bdf8/ffffff?text=REWARD';
+            const pointsRequired = Number(document.getElementById('rwd-points').value);
+            const stock = Number(document.getElementById('rwd-stock').value);
+
+            db.rewards.push({ id: 'RWD-' + Date.now(), title, image, pointsRequired, stock });
+            saveDB();
+            showToast('เพิ่มของรางวัลเรียบร้อย');
+            renderApp();
+        }
+
+        function adminDeleteReward(id) {
+            db.rewards = db.rewards.filter(r => r.id !== id);
+            saveDB();
+            showToast('ลบของรางวัลแล้ว', 'info');
+            renderApp();
+        }
+
+        function renderAdminCustomers() {
+            return `
+                <div class="space-y-6">
+                    <!-- Invite Codes Management -->
+                    <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs space-y-4">
+                        <h2 class="font-extrabold text-slate-800 text-base">🔑 จัดการ "รหัสลูกค้า" สำหรับใช้สมัครสมาชิก</h2>
+                        <form onsubmit="adminAddInviteCode(event)" class="flex flex-col sm:flex-row gap-2 text-xs">
+                            <input type="text" id="new-inv-code" required placeholder="ตั้งรหัสลูกค้าใหม่ เช่น VIP2026" class="px-3.5 py-2.5 rounded-xl border border-slate-300 uppercase font-bold">
+                            <input type="text" id="new-inv-note" placeholder="หมายเหตุ เช่น ลูกค้ากลุ่ม A" class="flex-1 px-3.5 py-2.5 rounded-xl border border-slate-300">
+                            <button type="submit" class="px-5 py-2.5 rounded-xl bg-bonny-600 text-white font-extrabold">+ สร้างรหัสลูกค้า</button>
+                        </form>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2.5">
+                            ${db.inviteCodes.map(c => `
+                                <div class="p-3 rounded-xl border border-slate-200 bg-slate-50 flex items-center justify-between text-xs">
+                                    <div>
+                                        <span class="font-extrabold text-bonny-700 text-sm">${c.code}</span>
+                                        <p class="text-slate-500 text-[11px]">${c.note || '-'}</p>
+                                    </div>
+                                    <div class="flex items-center gap-1.5">
+                                        <button onclick="adminToggleInviteCode('${c.id}')" class="px-2 py-1 rounded-lg font-bold ${c.active ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-200 text-slate-500'}">
+                                            ${c.active ? 'เปิด' : 'ปิด'}
+                                        </button>
+                                        <button onclick="adminDeleteInviteCode('${c.id}')" class="text-rose-500 font-bold px-1">✕</button>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+
+                    <!-- Registered Customers List -->
+                    <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs space-y-3">
+                        <h3 class="font-extrabold text-slate-800 text-base">👥 รายชื่อลูกค้าทั้งหมดในระบบ (${db.users.length} คน)</h3>
+                        <div class="space-y-2.5">
+                            ${db.users.map(u => `
+                                <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+                                    <div class="space-y-0.5">
+                                        <div class="flex items-center gap-2">
+                                            <strong class="text-sm text-slate-800">${u.fullName}</strong>
+                                            <span class="bg-bonny-100 text-bonny-700 font-extrabold px-2 py-0.5 rounded-full">${u.memberId}</span>
+                                        </div>
+                                        <p class="text-slate-600">User: <strong>${u.username}</strong> • Pass: <strong>${u.password}</strong> • รหัสลูกค้าที่ใช้: <strong>${u.inviteCode}</strong></p>
+                                        <p class="text-slate-500">โทร: ${u.phone} • LINE: ${u.lineId} • บัญชีรับเงินคืน: ${u.refundBank?.bankName ? `${u.refundBank.bankName} ${u.refundBank.accountNumber} (${u.refundBank.accountName})` : 'ยังไม่ระบุ'}</p>
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        <span class="font-extrabold text-amber-600 bg-amber-50 px-3 py-1.5 rounded-xl border border-amber-200">⭐ ${u.points} แต้ม</span>
+                                        <button onclick="adminEditUserPoints('${u.id}')" class="px-3 py-1.5 rounded-xl bg-slate-800 text-white font-bold">แก้แต้ม</button>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function adminAddInviteCode(e) {
+            e.preventDefault();
+            const code = document.getElementById('new-inv-code').value.trim().toUpperCase();
+            const note = document.getElementById('new-inv-note').value.trim();
+            if (db.inviteCodes.some(c => c.code === code)) {
+                showToast('รหัสลูกค้านี้มีอยู่แล้ว', 'error');
+                return;
+            }
+            db.inviteCodes.unshift({ id: 'INV-' + Date.now(), code, note, active: true });
+            saveDB();
+            showToast(`สร้างรหัสลูกค้า ${code} เรียบร้อย`);
+            renderApp();
+        }
+
+        function adminToggleInviteCode(id) {
+            const c = db.inviteCodes.find(item => item.id === id);
+            if (!c) return;
+            c.active = !c.active;
+            saveDB();
+            renderApp();
+        }
+
+        function adminDeleteInviteCode(id) {
+            db.inviteCodes = db.inviteCodes.filter(item => item.id !== id);
+            saveDB();
+            renderApp();
+        }
+
+        function adminEditUserPoints(userId) {
+            const u = db.users.find(item => item.id === userId);
+            if (!u) return;
+            openModal(`
+                <div class="bg-white rounded-3xl max-w-sm w-full p-5 shadow-2xl space-y-4">
+                    <h3 class="font-extrabold text-slate-800 text-sm">แก้ไขคะแนนสะสมของ ${u.fullName}</h3>
+                    <form onsubmit="saveUserPointsModal(event, '${u.id}')" class="space-y-3">
+                        <input type="number" id="modal-user-points" value="${u.points}" required class="w-full px-4 py-2.5 rounded-xl border border-slate-300 font-extrabold text-sm">
+                        <div class="flex gap-2">
+                            <button type="button" onclick="closeModal()" class="w-1/2 py-2.5 rounded-xl bg-slate-100 text-slate-600 text-xs font-bold">ยกเลิก</button>
+                            <button type="submit" class="w-1/2 py-2.5 rounded-xl bg-bonny-600 text-white text-xs font-extrabold">บันทึก</button>
+                        </div>
+                    </form>
+                </div>
+            `);
+        }
+
+        function saveUserPointsModal(e, userId) {
+            e.preventDefault();
+            const u = db.users.find(item => item.id === userId);
+            if (!u) return;
+            u.points = Number(document.getElementById('modal-user-points').value);
+            saveDB();
+            closeModal();
+            showToast('อัปเดตคะแนนสะสมเรียบร้อย');
+            renderApp();
+        }
+
+        function renderAdminSettings() {
+            const s = db.settings;
+            return `
+                <div class="bg-white p-5 sm:p-6 rounded-2xl border border-slate-200 shadow-xs max-w-2xl">
+                    <h2 class="font-extrabold text-slate-800 text-base mb-4">⚙️ แก้ไขข้อมูลหน้าเว็บไซต์ โลโก้ กฎกติกา และบัญชีรับโอนเงิน</h2>
+                    <form onsubmit="adminSaveSettings(event)" class="space-y-4 text-xs">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div>
+                                <label class="block font-bold mb-1">ชื่อเว็บไซต์ (Site Name)</label>
+                                <input type="text" id="set-sitename" value="${s.siteName}" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 font-bold">
+                            </div>
+                            <div>
+                                <label class="block font-bold mb-1">URL โลโก้เว็บ (เว้นว่างเพื่อใช้โลโก้เริ่มต้น)</label>
+                                <input type="url" id="set-logo" value="${s.logoUrl}" placeholder="https://..." class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block font-bold mb-1">คำอธิบายเว็บไซต์ (แสดงหน้าเข้าสู่ระบบ/สมัครสมาชิก)</label>
+                            <textarea id="set-desc" rows="2" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300">${s.siteDescription}</textarea>
+                        </div>
+                        <div>
+                            <label class="block font-bold mb-1">ข้อความประกาศหน้าแรก & แถบวิ่งด้านบน</label>
+                            <textarea id="set-announce" rows="2" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300">${s.announcement}</textarea>
+                        </div>
+                        <div>
+                            <label class="block font-bold mb-1">กฎกติกาการจองคิวเริ่มต้น</label>
+                            <textarea id="set-rules" rows="3" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300">${s.globalBookingRules}</textarea>
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div>
+                                <label class="block font-bold mb-1">ลิงก์ LINE ติดต่อแอดมิน</label>
+                                <input type="url" id="set-line" value="${s.adminLineUrl}" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300">
+                            </div>
+                            <div>
+                                <label class="block font-bold mb-1">แต้มที่ได้รับต่อบัตร 1 ใบ (เมื่อกดสำเร็จ)</label>
+                                <input type="number" id="set-points" value="${s.pointsPerTicket}" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300">
+                            </div>
+                        </div>
+                        <div class="pt-3 border-t border-slate-200 space-y-3">
+                            <h3 class="font-extrabold text-bonny-700">🏦 บัญชีธนาคารรับเงินมัดจำหน้าบ้าน</h3>
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                                <div>
+                                    <label class="block font-bold mb-1">ชื่อธนาคาร</label>
+                                    <input type="text" id="set-bank" value="${s.bankName}" required class="w-full px-3 py-2 rounded-xl border border-slate-300">
+                                </div>
+                                <div>
+                                    <label class="block font-bold mb-1">เลขที่บัญชี</label>
+                                    <input type="text" id="set-acc" value="${s.bankAccountNumber}" required class="w-full px-3 py-2 rounded-xl border border-slate-300">
+                                </div>
+                                <div>
+                                    <label class="block font-bold mb-1">ชื่อบัญชี</label>
+                                    <input type="text" id="set-accname" value="${s.bankAccountName}" required class="w-full px-3 py-2 rounded-xl border border-slate-300">
+                                </div>
+                            </div>
+                        </div>
+                        <button type="submit" class="w-full py-3.5 rounded-xl bg-bonny-600 hover:bg-bonny-700 text-white font-extrabold text-sm shadow-soft">
+                            บันทึกการตั้งค่าทั้งหมด
+                        </button>
+                    </form>
+                </div>
+            `;
+        }
+
+        function adminSaveSettings(e) {
+            e.preventDefault();
+            db.settings.siteName = document.getElementById('set-sitename').value.trim();
+            db.settings.logoUrl = document.getElementById('set-logo').value.trim();
+            db.settings.siteDescription = document.getElementById('set-desc').value.trim();
+            db.settings.announcement = document.getElementById('set-announce').value.trim();
+            db.settings.globalBookingRules = document.getElementById('set-rules').value.trim();
+            db.settings.adminLineUrl = document.getElementById('set-line').value.trim();
+            db.settings.pointsPerTicket = Number(document.getElementById('set-points').value);
+            db.settings.bankName = document.getElementById('set-bank').value.trim();
+            db.settings.bankAccountNumber = document.getElementById('set-acc').value.trim();
+            db.settings.bankAccountName = document.getElementById('set-accname').value.trim();
+            saveDB();
+            showToast('บันทึกการตั้งค่าหน้าเว็บไซต์และบัญชีเรียบร้อยแล้ว!');
+            renderApp();
+        }
+
+        /**
+         * ============================================================================
+         * 15-CARD FORTUNE TAROT READING ("กดดูดวง" -> เลือกไพ่ 3 ใบ -> เปิดไพ่)
+         * ============================================================================
+         */
+        function shuffleAndDrawThreeUniqueCards() {
+            const deckCopy = [...FORTUNE_DECK_15];
+            for (let i = deckCopy.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [deckCopy[i], deckCopy[j]] = [deckCopy[j], deckCopy[i]];
+            }
+            return deckCopy.slice(0, 3);
+        }
+
+        function openFortuneCardModal(e) {
+            if (e) spawnSparklesAt(e.clientX, e.clientY, 10);
+            fortuneState = {
+                drawnThreeCards: shuffleAndDrawThreeUniqueCards(),
+                selectedIndices: [],
+                isRevealed: false
+            };
+            renderFortuneModalContent();
+        }
+
+        function toggleSelectFortuneCard(idx, e) {
+            if (fortuneState.isRevealed) return;
+            if (e) spawnSparklesAt(e.clientX, e.clientY, 6);
+            const pos = fortuneState.selectedIndices.indexOf(idx);
+            if (pos > -1) {
+                fortuneState.selectedIndices.splice(pos, 1);
+            } else if (fortuneState.selectedIndices.length < 3) {
+                fortuneState.selectedIndices.push(idx);
+            }
+            renderFortuneModalContent();
+        }
+
+        function revealSelectedFortuneCards(e) {
+            if (fortuneState.selectedIndices.length < 3) {
+                showToast('กรุณาเลือกไพ่ให้ครบทั้ง 3 ใบก่อนกดเปิดไพ่นะคั้บ 🔮', 'error');
+                return;
+            }
+            if (e) spawnSparklesAt(e.clientX, e.clientY, 16);
+            fortuneState.isRevealed = true;
+            renderFortuneModalContent();
+            showToast('เปิดไพ่ทำนายดวงกดบัตรเรียบร้อยแล้ว ✨');
+        }
+
+        function renderFortuneModalContent() {
+            const selectedCount = fortuneState.selectedIndices.length;
+            const isRevealed = fortuneState.isRevealed;
+
+            openModal(`
+                <div class="bg-gradient-to-b from-sky-50 via-white to-indigo-50 rounded-3xl max-w-3xl w-full p-5 sm:p-6 shadow-2xl border-2 border-white space-y-5 my-auto">
+                    <div class="flex items-start justify-between gap-3">
+                        <div>
+                            <div class="inline-flex items-center gap-1.5 bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full text-[11px] font-extrabold mb-1">
+                                <span>🔮</span> สำรับไพ่มงคล Bonnyticket 15 ใบ (ไม่ซ้ำความหมาย)
+                            </div>
+                            <h3 class="text-lg sm:text-xl font-extrabold text-slate-800">
+                                ${isRevealed ? '✨ คำทำนายดวงกดบัตรของคุณทั้ง 3 ใบ ✨' : '🃏 ตั้งจิตอธิษฐาน แล้วเลือกไพ่ให้ครบ 3 ใบ'}
+                            </h3>
+                            <p class="text-xs text-slate-500 mt-0.5">
+                                ${isRevealed
+                                    ? 'ดูรูปไพ่ ชื่อไพ่ และความหมายมงคลด้านล่างได้เลย ขอให้กดบัตรได้โซนที่ชอบนะคั้บ!'
+                                    : `แตะเลือกไพ่ทั้ง 3 ใบด้านล่าง (เลือกแล้ว ${selectedCount}/3 ใบ) จากนั้นกดปุ่ม "เปิดไพ่"`}
+                            </p>
+                        </div>
+                        <button onclick="closeModal()" class="w-9 h-9 rounded-full bg-white border border-slate-200 text-slate-600 hover:bg-slate-100 font-extrabold shrink-0">
+                            ✕
+                        </button>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        ${fortuneState.drawnThreeCards.map((card, idx) => {
+                            const isSelected = fortuneState.selectedIndices.includes(idx);
+                            const orderBadge = isSelected ? fortuneState.selectedIndices.indexOf(idx) + 1 : null;
+
+                            if (!isRevealed) {
+                                return `
+                                    <button type="button" onclick="toggleSelectFortuneCard(${idx}, event)"
+                                        class="group relative rounded-3xl p-5 min-h-[240px] flex flex-col items-center justify-between text-white transition-all duration-300 border-2 ${isSelected ? 'bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 border-amber-300 -translate-y-2 shadow-xl ring-4 ring-amber-200/70' : 'bg-gradient-to-br from-sky-400 via-bonny-500 to-indigo-600 border-white hover:-translate-y-1 shadow-soft opacity-95 hover:opacity-100'}">
+                                        <div class="w-full flex items-center justify-between text-xs font-extrabold">
+                                            <span class="bg-white/20 px-2.5 py-0.5 rounded-full">ใบที่ ${idx + 1}</span>
+                                            ${isSelected
+                                                ? `<span class="bg-amber-300 text-slate-900 px-2.5 py-0.5 rounded-full shadow-xs">✓ เลือกแล้ว (#${orderBadge})</span>`
+                                                : `<span class="bg-white/15 px-2.5 py-0.5 rounded-full text-sky-100">แตะเพื่อเลือก</span>`}
+                                        </div>
+
+                                        <div class="my-4 flex flex-col items-center">
+                                            <div class="w-20 h-20 rounded-full bg-white/15 border-2 border-dashed border-white/60 flex items-center justify-center text-4xl group-hover:scale-110 transition-transform">
+                                                ☁️
+                                            </div>
+                                            <span class="mt-3 text-xs font-extrabold tracking-widest uppercase text-sky-100">BONNY TAROT</span>
+                                        </div>
+
+                                        <div class="w-full text-center text-[11px] font-bold bg-black/15 py-1.5 rounded-xl">
+                                            ${isSelected ? 'พร้อมเปิดไพ่ใบนี้ ✨' : 'กดเลือกไพ่ใบนี้'}
+                                        </div>
+                                    </button>
+                                `;
+                            }
+
+                            return `
+                                <div class="bg-white rounded-3xl border-2 border-bonny-200 shadow-cloud overflow-hidden flex flex-col justify-between transition-all duration-500">
+                                    <div class="bg-gradient-to-r ${card.gradient} p-3 text-white text-center relative">
+                                        <span class="text-[10px] font-extrabold uppercase tracking-widest bg-black/20 px-2.5 py-0.5 rounded-full">
+                                            ไพ่ใบที่ ${idx + 1} • ARCANA ${card.roman}
+                                        </span>
+                                    </div>
+                                    <div class="p-4 flex-1 flex flex-col items-center text-center justify-between space-y-3">
+                                        <div class="py-1">${card.svgArt}</div>
+                                        <div>
+                                            <span class="inline-block text-[10px] font-extrabold px-2.5 py-0.5 rounded-full ${card.badgeColor} mb-1">
+                                                ${card.subtitle}
+                                            </span>
+                                            <h4 class="font-extrabold text-slate-800 text-sm sm:text-base leading-snug">${card.name}</h4>
+                                        </div>
+                                        <p class="text-xs text-slate-600 bg-sky-50/80 border border-bonny-100 rounded-2xl p-3 leading-relaxed">
+                                            ${card.meaning}
+                                        </p>
+                                    </div>
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+
+                    <div class="flex flex-col sm:flex-row items-center justify-between gap-2.5 pt-2 border-t border-bonny-100">
+                        ${!isRevealed ? `
+                            <button type="button" onclick="openFortuneCardModal(event)"
+                                class="w-full sm:w-auto px-4 py-3 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-extrabold">
+                                🔄 สับไพ่ชุดใหม่
+                            </button>
+                            <button type="button" onclick="revealSelectedFortuneCards(event)"
+                                class="w-full sm:flex-1 py-3.5 px-6 rounded-2xl text-white font-extrabold text-sm shadow-soft transition-all ${selectedCount === 3 ? 'bg-gradient-to-r from-amber-400 via-orange-500 to-rose-500 hover:scale-[1.01] active:scale-98' : 'bg-slate-300 cursor-not-allowed'}">
+                                ✨ เปิดไพ่ (${selectedCount}/3 ใบ)
+                            </button>
+                        ` : `
+                            <button type="button" onclick="openFortuneCardModal(event)"
+                                class="w-full sm:w-auto px-5 py-3 rounded-2xl bg-indigo-500 hover:bg-indigo-600 text-white text-xs font-extrabold shadow-xs">
+                                🔮 ดูดวงใหม่อีกครั้ง
+                            </button>
+                            <button type="button" onclick="closeModal()"
+                                class="w-full sm:flex-1 py-3 px-6 rounded-2xl bg-gradient-to-r from-sky-400 to-bonny-600 text-white text-xs sm:text-sm font-extrabold shadow-soft">
+                                🎫 รับพลังมงคลแล้ว ไปเลือกงานจองคิวต่อ!
+                            </button>
+                        `}
+                    </div>
+                </div>
+            `);
+        }
+
+        /**
+         * ============================================================================
+         * CUTE DECORATIVE MICRO-FEATURES (MASCOT & SPARKLES)
+         * ============================================================================
+         */
+        function renderCloudMascotWidget() {
+            const tip = MASCOT_TIPS[state.mascotTipIndex % MASCOT_TIPS.length];
+            return `
+                <div class="fixed bottom-20 right-3 sm:right-5 z-40 flex flex-col items-end gap-2 pointer-events-none">
+                    ${state.mascotBubbleOpen ? `
+                        <div class="pointer-events-auto max-w-[235px] bg-white/95 backdrop-blur-md border-2 border-bonny-200 rounded-2xl p-3 shadow-cloud text-xs text-slate-700 relative">
+                            <button onclick="toggleMascotBubble(false)" aria-label="ซ่อนข้อความ"
+                                class="absolute -top-2 -left-2 w-5 h-5 rounded-full bg-bonny-100 text-bonny-700 hover:bg-bonny-200 flex items-center justify-center text-[10px] font-bold shadow-2xs">
+                                ✕
+                            </button>
+                            <p class="font-medium leading-relaxed text-[11.5px]">${tip}</p>
+                            <div class="mt-2 pt-1.5 border-t border-bonny-100 flex items-center justify-between gap-2">
+                                <button onclick="nextMascotTip()" class="text-[10.5px] font-bold text-bonny-600 hover:underline">
+                                    เปลี่ยนข้อความ ✨
+                                </button>
+                                <a href="${db.settings.adminLineUrl}" target="_blank"
+                                    class="inline-flex items-center gap-1 bg-emerald-500 hover:bg-emerald-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full transition-colors">
+                                    LINE แอดมิน
+                                </a>
+                            </div>
+                        </div>
+                    ` : ''}
+                    <button type="button" onclick="handleMascotClick(event)" title="น้องบอนนี่เมฆน้อย"
+                        class="pointer-events-auto relative w-14 h-14 rounded-full bg-gradient-to-b from-white to-sky-100 border-2 border-bonny-300 shadow-cloud flex items-center justify-center cute-bob hover:scale-110 active:scale-95 transition-transform">
+                        <svg class="w-11 h-11" viewBox="0 0 64 64" fill="none">
+                            <path d="M16 46h32a10 10 0 0 0 1.5-19.9A15 15 0 0 0 21 21a13 13 0 0 0-23 7A10 10 0 0 0 16 46z" fill="#e0f2fe" stroke="#38bdf8" stroke-width="2.5"/>
+                            <circle class="mascot-eye" cx="25" cy="34" r="2.2" fill="#0369a1"/>
+                            <circle class="mascot-eye" cx="39" cy="34" r="2.2" fill="#0369a1"/>
+                            <ellipse cx="20.5" cy="37" rx="2.5" ry="1.4" fill="#fda4af" opacity="0.8"/>
+                            <ellipse cx="43.5" cy="37" rx="2.5" ry="1.4" fill="#fda4af" opacity="0.8"/>
+                            <path d="M29.5 36.5c1.2 1.6 3.8 1.6 5 0" stroke="#0369a1" stroke-width="2" stroke-linecap="round"/>
+                            <path d="M32 10l1.3 3.2L36.5 14.5l-3.2 1.3L32 19l-1.3-3.2-3.2-1.3 3.2-1.3z" fill="#fbbf24"/>
+                        </svg>
+                        <span class="absolute -top-1 -left-1 bg-bonny-500 text-white text-[9px] font-extrabold px-1.5 rounded-full border border-white shadow-2xs">
+                            Hi!
+                        </span>
+                    </button>
+                </div>
+            `;
+        }
+
+        function toggleMascotBubble(isOpen) {
+            state.mascotBubbleOpen = isOpen;
+            renderApp();
+        }
+
+        function nextMascotTip() {
+            state.mascotTipIndex = (state.mascotTipIndex + 1) % MASCOT_TIPS.length;
+            renderApp();
+        }
+
+        function handleMascotClick(e) {
+            spawnSparklesAt(e.clientX, e.clientY, 6);
+            if (!state.mascotBubbleOpen) {
+                state.mascotBubbleOpen = true;
+            } else {
+                state.mascotTipIndex = (state.mascotTipIndex + 1) % MASCOT_TIPS.length;
+            }
+            renderApp();
+        }
+
+        function toggleSparkleEffect() {
+            state.sparklesEnabled = !state.sparklesEnabled;
+            localStorage.setItem('bonny_sparkles', state.sparklesEnabled ? 'true' : 'false');
+            showToast(state.sparklesEnabled ? 'เปิดเอฟเฟกต์ดาววิบวับแล้ว ✨' : 'ปิดเอฟเฟกต์ดาววิบวับแล้ว ☁️', 'info');
+            renderApp();
+        }
+
+        function spawnSparklesAt(x, y, count = 4) {
+            if (!state.sparklesEnabled) return;
+            const icons = ['✨', '🩵', '☁️', '⭐', '🌸'];
+            for (let i = 0; i < count; i++) {
+                const el = document.createElement('span');
+                el.className = 'sparkle-particle';
+                el.textContent = icons[Math.floor(Math.random() * icons.length)];
+                const offsetX = (Math.random() - 0.5) * 44;
+                const offsetY = (Math.random() - 0.5) * 32;
+                el.style.left = `${x + offsetX}px`;
+                el.style.top = `${y + offsetY}px`;
+                el.style.fontSize = `${12 + Math.floor(Math.random() * 10)}px`;
+                document.body.appendChild(el);
+                setTimeout(() => el.remove(), 880);
+            }
+        }
+
+        document.addEventListener('click', (e) => {
+            if (!state.sparklesEnabled) return;
+            spawnSparklesAt(e.clientX, e.clientY, 3);
+        });
+
+        /**
+         * ============================================================================
+         * MAIN RENDER CONTROLLER
+         * ============================================================================
+         */
+        function renderApp() {
+            const appEl = document.getElementById('app');
+            if (!appEl) return;
+            const user = getCurrentUser();
+
+            if (!user) {
+                appEl.innerHTML = renderAuthView();
+                return;
+            }
+
+            if (state.viewMode === 'admin' && isMasterAdmin(user)) {
+                appEl.innerHTML = renderAdminShell(user);
+                return;
+            }
+
+            appEl.innerHTML = renderCustomerShell(user);
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            renderApp();
+        });
+    </script>
+</body>
+</html>
